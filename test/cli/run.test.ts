@@ -7,6 +7,7 @@ import { main } from "../../src/cli/index.js";
 import { silentLogger } from "../../src/core/index.js";
 import type { GitHubClient } from "../../src/adapters/github-action/index.js";
 import type { RegistryClient } from "../../loops/dep-updates/index.js";
+import type { AiClient } from "../../src/ai/index.js";
 
 // The bundled loops live at <repo>/loops during tests.
 const LOOPS_DIR = join(process.cwd(), "loops");
@@ -50,10 +51,34 @@ describe("loopy run", () => {
     expect(client.createPullRequest).toHaveBeenCalledOnce();
   });
 
-  it("reports guidance for loops needing an AI provider", async () => {
-    const outcome = await run("auto-docs", { cwd: repo, logger: silentLogger });
+  it("reports guidance for auto-docs when no AI key is set", async () => {
+    const outcome = await run("auto-docs", { cwd: repo, logger: silentLogger, env: {} });
     expect(outcome.ran).toBe(false);
     expect(outcome.message).toMatch(/needs an AI provider/);
+    expect(outcome.message).toMatch(/OPENROUTER_API_KEY/);
+  });
+
+  it("runs auto-docs end-to-end with an injected AI client", async () => {
+    await writeFile(join(repo, "README.md"), "# x\nold\n");
+    const { mkdir } = await import("node:fs/promises");
+    await mkdir(join(repo, "src"), { recursive: true });
+    await writeFile(join(repo, "src", "a.ts"), "export const v = 1;\n");
+
+    const aiClient: AiClient = {
+      model: "test",
+      complete: async () => JSON.stringify([{ path: "README.md", contents: "# x\nnew\n" }]),
+    };
+    const client = fakeClient();
+    const outcome = await run("auto-docs", {
+      cwd: repo,
+      loopsDir: LOOPS_DIR,
+      client,
+      aiClient,
+      logger: silentLogger,
+      env: {},
+    });
+    expect(outcome.ran).toBe(true);
+    expect(outcome.publish?.status).toBe("published");
   });
 });
 

@@ -25,7 +25,7 @@ describe("loopy add", () => {
     expect(content).toContain("workflow_dispatch: {}");
     expect(content).toContain("npx -y loopy run dep-updates");
     expect(content).toContain("GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}");
-    expect(content).not.toContain("ANTHROPIC_API_KEY");
+    expect(content).not.toContain("OPENROUTER_API_KEY");
   });
 
   it("uses the PR event trigger and comment permissions for pr-review", async () => {
@@ -33,7 +33,7 @@ describe("loopy add", () => {
     const content = await readFile(join(repo, result.path), "utf8");
     expect(content).toContain("  pull_request:");
     expect(content).toContain("pull-requests: write");
-    expect(content).toContain("ANTHROPIC_API_KEY");
+    expect(content).toContain("OPENROUTER_API_KEY");
   });
 
   it("rejects an unknown loop with guidance", async () => {

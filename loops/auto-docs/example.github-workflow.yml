@@ -3,9 +3,9 @@
 # Copy this to `.github/workflows/auto-docs.yml` in your repo. It is intentionally
 # NOT placed under loopy's own `.github/workflows/` so it never runs on this repo.
 #
-# The `act` (doc-writing) step is the AI boundary: wire it to your AI runner of
-# choice (e.g. an Anthropic API call or a Claude Code action) that implements the
-# `DocWriter` interface described in playbook.md.
+# The `act` (doc-writing) step is the AI boundary. loopy ships an OpenAI-compatible
+# provider that defaults to OpenRouter — just set OPENROUTER_API_KEY (optionally
+# LOOPY_AI_MODEL / LOOPY_AI_BASE_URL). Or wire your own DocWriter (see playbook.md).
 
 name: auto-docs
 on:
@@ -30,5 +30,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: node ./scripts/run-auto-docs.mjs
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: npx -y loopy run auto-docs
