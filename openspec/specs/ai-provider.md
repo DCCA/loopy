@@ -3,7 +3,7 @@
 > Source of truth. Established by change `add-openrouter-ai-provider` (2026-06-21).
 
 loopy ships a built-in, OpenAI-compatible AI provider (defaulting to OpenRouter
-with a Claude model) that powers the loops' injected AI boundaries.
+with the `z-ai/glm-5.2` model) that powers the loops' injected AI boundaries.
 
 ## Requirements
 
@@ -20,7 +20,7 @@ OpenRouter, configurable by environment.
 #### Scenario: Config resolved from environment
 - GIVEN `OPENROUTER_API_KEY` is set
 - WHEN the AI config is resolved
-- THEN it uses the OpenRouter base URL and the default Claude model unless overridden by `LOOPY_AI_BASE_URL` / `LOOPY_AI_MODEL`
+- THEN it uses the OpenRouter base URL and the default `z-ai/glm-5.2` model unless overridden by `LOOPY_AI_BASE_URL` / `LOOPY_AI_MODEL`
 
 #### Scenario: No key
 - GIVEN no AI API key is set

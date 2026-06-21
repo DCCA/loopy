@@ -9,12 +9,12 @@ import {
 } from "../../src/ai/index.js";
 
 describe("resolveAiConfig", () => {
-  it("defaults to OpenRouter + Claude when OPENROUTER_API_KEY is set", () => {
+  it("defaults to OpenRouter + GLM 5.2 when OPENROUTER_API_KEY is set", () => {
     const cfg = resolveAiConfig({ OPENROUTER_API_KEY: "k" });
     expect(cfg).toEqual({
       apiKey: "k",
       baseUrl: "https://openrouter.ai/api/v1",
-      model: "anthropic/claude-3.7-sonnet",
+      model: "z-ai/glm-5.2",
     });
   });
 
@@ -52,7 +52,7 @@ describe("createOpenAiCompatibleClient", () => {
     );
     const client = createOpenAiCompatibleClient({
       apiKey: "secret",
-      model: "anthropic/claude-3.7-sonnet",
+      model: "z-ai/glm-5.2",
       fetchImpl: fetchImpl as unknown as typeof fetch,
     });
     const out = await client.complete({ messages: [{ role: "user", content: "yo" }] });
@@ -63,7 +63,7 @@ describe("createOpenAiCompatibleClient", () => {
     const headers = (init as { headers: Record<string, string> }).headers;
     expect(headers["authorization"]).toBe("Bearer secret");
     const body = JSON.parse((init as { body: string }).body);
-    expect(body.model).toBe("anthropic/claude-3.7-sonnet");
+    expect(body.model).toBe("z-ai/glm-5.2");
   });
 
   it("throws on a non-ok response", async () => {
