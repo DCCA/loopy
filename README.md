@@ -57,11 +57,24 @@ npm test            # vitest
 
 Requires Node.js >= 20.
 
-## Using a loop
+## 1-click import
 
-See [`loops/auto-docs/README.md`](loops/auto-docs/README.md) and
-[`loops/auto-docs/example.github-workflow.yml`](loops/auto-docs/example.github-workflow.yml)
-for a consumer setup.
+Import any loop into your repo with a single command — it scaffolds a
+ready-to-run GitHub workflow wired to the loop's trigger, output, and secrets:
+
+```bash
+npx loopy add dep-updates     # scaffolds .github/workflows/loopy-dep-updates.yml
+npx loopy list                # see all loops and what each needs
+```
+
+Commit the generated workflow and set the listed secrets (always `GITHUB_TOKEN`;
+AI loops also need `ANTHROPIC_API_KEY`). The workflow runs `npx loopy run <loop>`,
+which executes the loop and opens the PR/comment. Deterministic loops
+(`dep-updates`, `changelog`) are turnkey; loops with an AI `act` step take an
+injected provider (see the loop's README).
+
+For a fully manual setup instead, see
+[`loops/auto-docs/example.github-workflow.yml`](loops/auto-docs/example.github-workflow.yml).
 
 ## License
 

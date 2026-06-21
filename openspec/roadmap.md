@@ -26,6 +26,13 @@ coverage report, scanner findings, fixer) is an **injected boundary**, so the
 loops are fully unit-tested with fakes. Wiring the real boundaries (live GitHub
 API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 
+## Platform
+
+| Capability | Spec | Status |
+|------------|------|--------|
+| 1-click loop import (`loopy add/list/run`) | [`specs/cli.md`](specs/cli.md) | ✅ done |
+| CI gate (typecheck/lint/test/build) | [`specs/ci.md`](specs/ci.md) | ✅ done |
+
 ## Backlog (catalogued, not yet proposed)
 
 From the research catalog, the next candidates: API reference sync, docstring
