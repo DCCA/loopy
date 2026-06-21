@@ -5,6 +5,7 @@ import {
   loadManifest,
   runLoop,
   type Logger,
+  type Loop,
   type RunResult,
 } from "../../core/index.js";
 import {
@@ -23,8 +24,14 @@ import {
   createGitCommitProvider,
   type CommitProvider,
 } from "../../../loops/changelog/index.js";
-import { getEntry } from "../catalog.js";
-import type { Loop } from "../../core/index.js";
+import { createAutoDocsLoopFromManifest } from "../../../loops/auto-docs/index.js";
+import {
+  createDocWriter,
+  createOpenAiCompatibleClient,
+  resolveAiConfig,
+  type AiClient,
+} from "../../ai/index.js";
+import { getEntry, type CatalogEntry } from "../catalog.js";
 
 export interface RunOptions {
   cwd?: string;
@@ -40,6 +47,9 @@ export interface RunOptions {
   /** boundary overrides (primarily for tests) */
   registry?: RegistryClient;
   commitProvider?: CommitProvider;
+  aiClient?: AiClient;
+  /** environment used for AI config resolution (defaults to process.env) */
+  env?: Record<string, string | undefined>;
 }
 
 export interface RunOutcome {
@@ -57,26 +67,17 @@ export async function run(loopId: string, options: RunOptions = {}): Promise<Run
     throw new Error(`unknown loop "${loopId}". Run "loopy list".`);
   }
 
-  if (!entry.runnable) {
-    return {
-      ran: false,
-      message:
-        `\`${loopId}\` needs an AI provider for its act step, which \`loopy run\` does ` +
-        `not bundle yet. Use it programmatically (supply services.<boundary>) — see ` +
-        `loops/${loopId}/README.md and playbook.md.`,
-    };
-  }
-
   const cwd = options.cwd ?? process.cwd();
   const loopsDir = options.loopsDir ?? DEFAULT_LOOPS_DIR;
   const logger = options.logger ?? consoleLogger;
+  const manifestPath = join(loopsDir, loopId, "loop.yaml");
 
-  const loop = await buildLoop(loopId, join(loopsDir, loopId, "loop.yaml"), cwd, options);
-  if (!loop) {
-    return { ran: false, message: `\`${loopId}\` is not runnable via the CLI yet.` };
+  const built = await buildLoop(entry, manifestPath, cwd, options);
+  if (typeof built === "string") {
+    return { ran: false, message: built };
   }
 
-  const result = await runLoop(loop, { repoRoot: cwd, logger, dryRun: options.dryRun });
+  const result = await runLoop(built, { repoRoot: cwd, logger, dryRun: options.dryRun });
   if (result.status !== "produced") {
     return { ran: true, run: result, publish: { status: "no-op", reason: result.status } };
   }
@@ -84,39 +85,70 @@ export async function run(loopId: string, options: RunOptions = {}): Promise<Run
     return { ran: true, run: result, publish: { status: "no-op", reason: "dry-run" } };
   }
 
-  const client = options.client ?? clientFromEnv();
+  const client = options.client ?? clientFromEnv(options.env);
   const publish = await publishRunResult(result, client, {
     baseBranch: options.baseBranch,
-    guardrails: loop.guardrails,
+    guardrails: built.guardrails,
     prNumber: options.prNumber,
   });
   return { ran: true, run: result, publish };
 }
 
+/** Build the loop, or return a human-readable reason it cannot run yet. */
 async function buildLoop(
-  loopId: string,
+  entry: CatalogEntry,
   manifestPath: string,
   cwd: string,
   options: RunOptions,
-): Promise<Loop | null> {
-  const manifest = await loadManifest(manifestPath);
-  switch (loopId) {
-    case "dep-updates":
+): Promise<Loop | string> {
+  switch (entry.id) {
+    case "dep-updates": {
+      const manifest = await loadManifest(manifestPath);
       return createDepUpdatesLoopFromManifest(manifest, {
         registry: options.registry ?? createNpmRegistryClient(),
       });
-    case "changelog":
+    }
+    case "changelog": {
+      const manifest = await loadManifest(manifestPath);
       return createChangelogLoopFromManifest(manifest, {
         commits: options.commitProvider ?? createGitCommitProvider(cwd),
       });
+    }
+    case "auto-docs": {
+      const client = options.aiClient ?? aiClientFromEnv(options.env);
+      if (!client) {
+        return (
+          "`auto-docs` needs an AI provider. Set OPENROUTER_API_KEY (or LOOPY_AI_API_KEY / " +
+          "OPENAI_API_KEY) in the workflow; optionally LOOPY_AI_MODEL / LOOPY_AI_BASE_URL. " +
+          "See loops/auto-docs/README.md."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      return createAutoDocsLoopFromManifest(manifest, { docWriter: createDocWriter(client) });
+    }
     default:
-      return null; // loops requiring an AI provider are not turnkey yet
+      return (
+        `\`${entry.id}\` is not runnable via the CLI yet (needs additional boundaries — ` +
+        `see loops/${entry.id}/README.md).`
+      );
   }
 }
 
-function clientFromEnv(): GitHubClient {
-  const token = process.env["GITHUB_TOKEN"];
-  const repo = process.env["GITHUB_REPOSITORY"];
+function aiClientFromEnv(env?: Record<string, string | undefined>): AiClient | null {
+  const config = resolveAiConfig(env ?? process.env);
+  if (!config) return null;
+  return createOpenAiCompatibleClient({
+    apiKey: config.apiKey,
+    model: config.model,
+    baseUrl: config.baseUrl,
+    title: "loopy",
+  });
+}
+
+function clientFromEnv(env?: Record<string, string | undefined>): GitHubClient {
+  const source = env ?? process.env;
+  const token = source["GITHUB_TOKEN"];
+  const repo = source["GITHUB_REPOSITORY"];
   if (!token || !repo || !repo.includes("/")) {
     throw new Error(
       "GITHUB_TOKEN and GITHUB_REPOSITORY (owner/repo) are required to open a PR or comment.",

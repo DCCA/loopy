@@ -11,13 +11,16 @@ export interface CatalogEntry {
   output: "pull-request" | "comment";
   /** secrets the scaffolded workflow wires (GITHUB_TOKEN is always present) */
   secrets: string[];
-  /** true when `loopy run` can execute it with built-in default boundaries */
-  runnable: boolean;
 }
 
 const GH = "GITHUB_TOKEN";
-const AI = "ANTHROPIC_API_KEY";
+const AI = "OPENROUTER_API_KEY";
 const WEEKLY = "0 6 * * 1";
+
+/** A loop needs an AI provider when it wires the AI secret. */
+export function needsAi(entry: CatalogEntry): boolean {
+  return entry.secrets.includes(AI);
+}
 
 /** The single source of truth backing `add`, `list`, and `run`. */
 export const CATALOG: CatalogEntry[] = [
@@ -27,7 +30,6 @@ export const CATALOG: CatalogEntry[] = [
     trigger: { kind: "schedule", cron: WEEKLY },
     output: "pull-request",
     secrets: [GH, AI],
-    runnable: false,
   },
   {
     id: "dep-updates",
@@ -35,7 +37,6 @@ export const CATALOG: CatalogEntry[] = [
     trigger: { kind: "schedule", cron: WEEKLY },
     output: "pull-request",
     secrets: [GH],
-    runnable: true,
   },
   {
     id: "changelog",
@@ -43,7 +44,6 @@ export const CATALOG: CatalogEntry[] = [
     trigger: { kind: "schedule", cron: WEEKLY },
     output: "pull-request",
     secrets: [GH],
-    runnable: true,
   },
   {
     id: "pr-review",
@@ -51,7 +51,6 @@ export const CATALOG: CatalogEntry[] = [
     trigger: { kind: "event", events: ["pull_request"] },
     output: "comment",
     secrets: [GH, AI],
-    runnable: false,
   },
   {
     id: "test-coverage",
@@ -59,7 +58,6 @@ export const CATALOG: CatalogEntry[] = [
     trigger: { kind: "schedule", cron: WEEKLY },
     output: "pull-request",
     secrets: [GH, AI],
-    runnable: false,
   },
   {
     id: "security-remediation",
@@ -67,7 +65,6 @@ export const CATALOG: CatalogEntry[] = [
     trigger: { kind: "schedule", cron: "0 6 * * *" },
     output: "pull-request",
     secrets: [GH],
-    runnable: false,
   },
 ];
 
