@@ -1,0 +1,11 @@
+id: pr-review
+
+trigger:
+  type: event
+  events:
+    - pull_request
+
+# Output is an advisory comment, not file changes, so path guardrails do not apply.
+guardrails: {}
+
+config: {}

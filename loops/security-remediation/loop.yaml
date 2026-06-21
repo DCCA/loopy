@@ -1,0 +1,16 @@
+id: security-remediation
+
+trigger:
+  type: schedule
+  cron: "0 6 * * *" # daily 06:00 UTC
+
+guardrails:
+  pathAllowlist:
+    - "package.json"
+    - "src/**"
+  maxFiles: 25
+  skipIfOpenPr: true
+
+config:
+  # Act only on findings at or above this severity: low | medium | high | critical
+  severityThreshold: high

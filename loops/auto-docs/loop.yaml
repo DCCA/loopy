@@ -1,0 +1,28 @@
+id: auto-docs
+
+# When the loop runs. Weekly is a sensible default for doc drift; consumers may
+# switch to an "event" trigger on push to main.
+trigger:
+  type: schedule
+  cron: "0 6 * * 1" # Mondays at 06:00 UTC
+
+# Safety rails enforced by the runner over any change set this loop produces.
+guardrails:
+  pathAllowlist:
+    - "README.md"
+    - "docs/**"
+  maxFiles: 25
+  skipIfOpenPr: true
+
+# Loop-specific configuration consumed by the auto-docs loop.
+config:
+  # Globs describing the code surface whose changes should trigger doc updates.
+  codeSurface:
+    - "src/**/*.ts"
+  # Docs the loop is allowed to write.
+  docTargets:
+    - "README.md"
+    - "docs/**/*.md"
+  # Marker file storing the last-synced code-surface fingerprint (lives under an
+  # allowlisted path so the runner permits writing it).
+  markerPath: "docs/.loopy-auto-docs.json"

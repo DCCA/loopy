@@ -1,0 +1,34 @@
+# Example workflow for CONSUMERS of the auto-docs loop.
+#
+# Copy this to `.github/workflows/auto-docs.yml` in your repo. It is intentionally
+# NOT placed under loopy's own `.github/workflows/` so it never runs on this repo.
+#
+# The `act` (doc-writing) step is the AI boundary: wire it to your AI runner of
+# choice (e.g. an Anthropic API call or a Claude Code action) that implements the
+# `DocWriter` interface described in playbook.md.
+
+name: auto-docs
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch: {} # manual run
+
+permissions:
+  contents: write # create branch + commit
+  pull-requests: write # open the PR
+
+jobs:
+  auto-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - name: Run auto-docs loop
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node ./scripts/run-auto-docs.mjs
