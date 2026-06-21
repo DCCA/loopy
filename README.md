@@ -72,15 +72,15 @@ AI loops also need `OPENROUTER_API_KEY`). The workflow runs `npx loopy run <loop
 which executes the loop and opens the PR/comment.
 
 **AI provider.** loopy ships an OpenAI-compatible client that defaults to
-[OpenRouter](https://openrouter.ai) and a Claude model — set `OPENROUTER_API_KEY`
-and you're done. It's configurable via env, so any OpenAI-compatible endpoint
-works:
+[OpenRouter](https://openrouter.ai) and the `z-ai/glm-5.2` model — set
+`OPENROUTER_API_KEY` and you're done. It's configurable via env, so any
+OpenAI-compatible endpoint/model works:
 
 | Env var | Default | Purpose |
 |---------|---------|---------|
 | `OPENROUTER_API_KEY` (or `LOOPY_AI_API_KEY` / `OPENAI_API_KEY`) | — | API key |
 | `LOOPY_AI_BASE_URL` | `https://openrouter.ai/api/v1` | OpenAI-compatible base URL |
-| `LOOPY_AI_MODEL` | `anthropic/claude-3.7-sonnet` | model id |
+| `LOOPY_AI_MODEL` | `z-ai/glm-5.2` | model id |
 
 `dep-updates` and `changelog` are deterministic (no AI). `auto-docs` is turnkey
 once an AI key is set; `pr-review` and `test-coverage` also need their non-AI

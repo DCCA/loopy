@@ -1,6 +1,6 @@
 import { DEFAULT_AI_BASE_URL } from "./client.js";
 
-export const DEFAULT_AI_MODEL = "anthropic/claude-3.7-sonnet";
+export const DEFAULT_AI_MODEL = "z-ai/glm-5.2";
 
 export interface AiConfig {
   apiKey: string;
@@ -17,7 +17,7 @@ type Env = Record<string, string | undefined>;
  * Recognized keys (first match wins for the key):
  *   OPENROUTER_API_KEY | LOOPY_AI_API_KEY | OPENAI_API_KEY
  *   LOOPY_AI_BASE_URL (default OpenRouter)
- *   LOOPY_AI_MODEL    (default anthropic/claude-3.7-sonnet)
+ *   LOOPY_AI_MODEL    (default z-ai/glm-5.2)
  */
 export function resolveAiConfig(env: Env = process.env): AiConfig | null {
   const apiKey =
