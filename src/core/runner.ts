@@ -20,18 +20,32 @@ export async function runLoop(loop: Loop, ctx: RunContext): Promise<RunResult> {
 
     const acted = await loop.act(ctx, detected);
 
-    if (acted.changes.length === 0) {
-      ctx.logger.info(`[${loop.id}] act produced no changes`);
-      return { loopId: loop.id, status: "no-work", reason: "act produced no changes" };
+    // Comment output channel (no file changes, so no path guardrails apply).
+    if (acted.comment && acted.comment.trim().length > 0) {
+      ctx.logger.info(`[${loop.id}] produced a comment`);
+      return {
+        loopId: loop.id,
+        status: "produced",
+        outputKind: "comment",
+        comment: acted.comment,
+        summary: acted.summary,
+      };
     }
 
-    enforceGuardrails(acted.changes, loop.guardrails);
+    const changes = acted.changes ?? [];
+    if (changes.length === 0) {
+      ctx.logger.info(`[${loop.id}] act produced no output`);
+      return { loopId: loop.id, status: "no-work", reason: "act produced no output" };
+    }
 
-    ctx.logger.info(`[${loop.id}] produced ${acted.changes.length} change(s)`);
+    enforceGuardrails(changes, loop.guardrails);
+
+    ctx.logger.info(`[${loop.id}] produced ${changes.length} change(s)`);
     return {
       loopId: loop.id,
       status: "produced",
-      changes: acted.changes,
+      outputKind: "pull-request",
+      changes,
       summary: acted.summary,
     };
   } catch (err) {

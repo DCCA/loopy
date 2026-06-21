@@ -22,6 +22,18 @@
     "./loops/changelog": {
       "types": "./dist/loops/changelog/index.d.ts",
       "default": "./dist/loops/changelog/index.js"
+    },
+    "./loops/pr-review": {
+      "types": "./dist/loops/pr-review/index.d.ts",
+      "default": "./dist/loops/pr-review/index.js"
+    },
+    "./loops/test-coverage": {
+      "types": "./dist/loops/test-coverage/index.d.ts",
+      "default": "./dist/loops/test-coverage/index.js"
+    },
+    "./loops/security-remediation": {
+      "types": "./dist/loops/security-remediation/index.d.ts",
+      "default": "./dist/loops/security-remediation/index.js"
     }
   },
   "files": [

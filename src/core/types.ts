@@ -50,8 +50,11 @@ export type FileChange =
   | { path: string; op: "delete" };
 
 export interface ActResult {
-  changes: FileChange[];
-  /** summary used as the PR body / run report */
+  /** file changes; when non-empty the output is a pull request */
+  changes?: FileChange[];
+  /** advisory comment body; when non-empty the output is a comment */
+  comment?: string;
+  /** summary used as the PR body / comment header / run report */
   summary: string;
 }
 
@@ -61,17 +64,22 @@ export interface Loop {
   readonly guardrails: Guardrails;
   /** decide whether there is work to do (cheap, deterministic where possible) */
   detect(ctx: RunContext): Promise<DetectResult>;
-  /** perform the work and return a reviewable change set */
+  /** perform the work and return a reviewable change set or comment */
   act(ctx: RunContext, detected: DetectResult): Promise<ActResult>;
 }
 
 export type RunStatus = "no-work" | "produced" | "skipped" | "failed";
 
+/** The kind of output a produced run yields. */
+export type OutputKind = "pull-request" | "comment";
+
 export interface RunResult {
   loopId: string;
   status: RunStatus;
   reason?: string;
+  outputKind?: OutputKind;
   changes?: FileChange[];
+  comment?: string;
   summary?: string;
   error?: Error;
 }

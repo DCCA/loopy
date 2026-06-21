@@ -18,11 +18,23 @@ export interface PullRequestRef {
   url: string;
 }
 
+export interface PostCommentInput {
+  /** the PR/issue number to comment on */
+  issueNumber: number;
+  body: string;
+}
+
+export interface CommentRef {
+  url: string;
+}
+
 /** The GitHub operations the adapter needs, isolated for testability. */
 export interface GitHubClient {
   /** true if an open PR created by this loop already exists */
   hasOpenLoopPr(query: OpenPrQuery): Promise<boolean>;
   createPullRequest(input: CreatePrInput): Promise<PullRequestRef>;
+  /** post an advisory comment on a PR/issue */
+  postComment(input: PostCommentInput): Promise<CommentRef>;
 }
 
 export interface PublishOptions {
@@ -30,24 +42,46 @@ export interface PublishOptions {
   branchPrefix?: string;
   guardrails?: Guardrails;
   title?: string;
+  /** target PR/issue number for comment-output loops */
+  prNumber?: number;
 }
 
 export type PublishResult =
   | { status: "skipped"; reason: string }
   | { status: "no-op"; reason: string }
-  | { status: "published"; pr: PullRequestRef };
+  | { status: "published"; pr: PullRequestRef }
+  | { status: "commented"; comment: CommentRef };
 
 /**
- * Turn a produced {@link RunResult} into a pull request, honoring the
- * `skipIfOpenPr` guardrail (defaults to on). Never commits to the base branch.
+ * Publish a produced {@link RunResult}. For pull-request output it opens a PR,
+ * honoring the `skipIfOpenPr` guardrail (defaults to on) and never committing to
+ * the base branch. For comment output it posts an advisory comment.
  */
 export async function publishRunResult(
   result: RunResult,
   client: GitHubClient,
   options: PublishOptions = {},
 ): Promise<PublishResult> {
-  if (result.status !== "produced" || !result.changes || result.changes.length === 0) {
+  if (result.status !== "produced") {
     return { status: "no-op", reason: `run status was "${result.status}"` };
+  }
+
+  if (result.outputKind === "comment") {
+    if (!result.comment) {
+      return { status: "no-op", reason: "comment output had no body" };
+    }
+    if (options.prNumber == null) {
+      return { status: "no-op", reason: "no PR/issue number provided for comment output" };
+    }
+    const comment = await client.postComment({
+      issueNumber: options.prNumber,
+      body: result.comment,
+    });
+    return { status: "commented", comment };
+  }
+
+  if (!result.changes || result.changes.length === 0) {
+    return { status: "no-op", reason: "no changes to publish" };
   }
 
   const skipIfOpenPr = options.guardrails?.skipIfOpenPr ?? true;

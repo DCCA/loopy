@@ -2,7 +2,8 @@
 
 **Change ID:** `add-security-remediation-loop`
 **Created:** 2026-06-21
-**Status:** Planned
+**Status:** Implementation Complete
+**Completed:** 2026-06-21
 
 ---
 
@@ -51,3 +52,11 @@ the dep-updates loop: this one is severity-driven, that one is freshness-driven.
 | False-positive PR noise | Med | Med | Filter step + severity threshold |
 | Incorrect fix | Low | High | Human-gated merge; CI gate; one finding per PR |
 | Secret exposure in PR | Low | High | Out of scope here; handled by a secret-leak loop, alert-first |
+
+---
+
+## Archive Information
+
+**Archived:** 2026-06-21
+**Outcome:** Successfully implemented (injected boundaries, validated with fakes)
+**Verification:** typecheck + lint + 54 tests + build all passing

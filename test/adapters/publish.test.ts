@@ -17,6 +17,7 @@ function client(overrides: Partial<GitHubClient> = {}): GitHubClient {
   return {
     hasOpenLoopPr: vi.fn(async () => false),
     createPullRequest: vi.fn(async () => ({ number: 7, url: "https://example/pr/7" })),
+    postComment: vi.fn(async () => ({ url: "https://example/pr/7#comment" })),
     ...overrides,
   };
 }
@@ -54,5 +55,34 @@ describe("publishRunResult", () => {
     );
     expect(result.status).toBe("no-op");
     expect(c.createPullRequest).not.toHaveBeenCalled();
+  });
+
+  it("posts a comment for comment-output results", async () => {
+    const c = client();
+    const result = await publishRunResult(
+      {
+        loopId: "pr-review",
+        status: "produced",
+        outputKind: "comment",
+        comment: "Looks good, two notes inside.",
+        summary: "",
+      },
+      c,
+      { prNumber: 12 },
+    );
+    expect(result).toEqual({ status: "commented", comment: { url: "https://example/pr/7#comment" } });
+    expect(c.createPullRequest).not.toHaveBeenCalled();
+    const input = vi.mocked(c.postComment).mock.calls[0]?.[0];
+    expect(input).toEqual({ issueNumber: 12, body: "Looks good, two notes inside." });
+  });
+
+  it("is a no-op for comment output with no target PR number", async () => {
+    const c = client();
+    const result = await publishRunResult(
+      { loopId: "pr-review", status: "produced", outputKind: "comment", comment: "hi", summary: "" },
+      c,
+    );
+    expect(result.status).toBe("no-op");
+    expect(c.postComment).not.toHaveBeenCalled();
   });
 });

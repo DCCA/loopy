@@ -1,6 +1,7 @@
 import type {
   ActResult,
   DetectResult,
+  FileChange,
   Guardrails,
   Loop,
   LoopManifest,
@@ -88,7 +89,7 @@ export function createAutoDocsLoop(
         current,
       });
 
-      const changes: ActResult["changes"] = docChanges.map((d) => ({
+      const changes: FileChange[] = docChanges.map((d) => ({
         path: d.path,
         op: "write",
         contents: d.contents,

@@ -1,4 +1,11 @@
-import type { CreatePrInput, GitHubClient, OpenPrQuery, PullRequestRef } from "./index.js";
+import type {
+  CommentRef,
+  CreatePrInput,
+  GitHubClient,
+  OpenPrQuery,
+  PostCommentInput,
+  PullRequestRef,
+} from "./index.js";
 
 export interface GitHubRestOptions {
   owner: string;
@@ -103,6 +110,15 @@ export function createGitHubRestClient(opts: GitHubRestOptions): GitHubClient {
         body: input.body,
       });
       return { number: pr.number, url: pr.html_url };
+    },
+
+    async postComment(input: PostCommentInput): Promise<CommentRef> {
+      const res = await api<{ html_url: string }>(
+        "POST",
+        `${base}/issues/${input.issueNumber}/comments`,
+        { body: input.body },
+      );
+      return { url: res.html_url };
     },
   };
 }

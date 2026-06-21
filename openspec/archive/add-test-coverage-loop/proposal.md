@@ -2,7 +2,8 @@
 
 **Change ID:** `add-test-coverage-loop`
 **Created:** 2026-06-21
-**Status:** Planned
+**Status:** Implementation Complete
+**Completed:** 2026-06-21
 
 ---
 
@@ -50,3 +51,11 @@ this repo today; they are modeled as injected boundaries.
 |------|-------------|--------|------------|
 | Low-quality/assertion-free tests | Med | Med | Self-validation gate + human review |
 | Flaky generated tests | Med | Med | Require passing run before output |
+
+---
+
+## Archive Information
+
+**Archived:** 2026-06-21
+**Outcome:** Successfully implemented (injected boundaries, validated with fakes)
+**Verification:** typecheck + lint + 54 tests + build all passing

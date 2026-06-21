@@ -16,7 +16,7 @@ trigger → detect → act → output → guardrails
 - **trigger** — cron schedule, repo event, or manual run
 - **detect** — decide whether there is work to do (cheap/deterministic)
 - **act** — do the work; an AI/agent step, deterministic code, or both
-- **output** — a reviewable **pull request** (safe, reversible)
+- **output** — a reviewable **pull request** (safe, reversible), or an advisory **comment**
 - **guardrails** — path allowlist, max-files cap, idempotency, approvals
 
 The runner is loop-agnostic and **fails safe**: on any error (including a
@@ -24,15 +24,18 @@ guardrail violation) it produces no output and never partially applies changes.
 
 ## Loops
 
-| Loop | What it does | `act` | Status |
+| Loop | What it does | `act` | Output |
 |------|--------------|-------|--------|
-| [`auto-docs`](loops/auto-docs/README.md) | Opens a PR to update docs when the code surface drifts | AI | ✅ implemented |
-| [`dep-updates`](loops/dep-updates/README.md) | Opens one grouped PR bumping non-major dependency updates | deterministic | ✅ implemented |
-| [`changelog`](loops/changelog/README.md) | Opens a PR with a changelog entry from unreleased commits | deterministic | ✅ implemented |
-| `pr-review`, `test-coverage`, `security-remediation` | See roadmap | — | 📋 planned |
+| [`auto-docs`](loops/auto-docs/README.md) | Updates docs when the code surface drifts | AI | PR |
+| [`dep-updates`](loops/dep-updates/README.md) | One grouped PR bumping non-major dependency updates | deterministic | PR |
+| [`changelog`](loops/changelog/README.md) | A changelog entry from unreleased commits | deterministic | PR |
+| [`pr-review`](loops/pr-review/README.md) | An advisory automated review comment on a PR | AI | comment |
+| [`test-coverage`](loops/test-coverage/README.md) | Backfills tests for uncovered changed lines (self-validating) | AI | PR |
+| [`security-remediation`](loops/security-remediation/README.md) | Human-gated fixes for security findings above a threshold | hybrid | PR |
 
-See the [roadmap](openspec/roadmap.md) for what's planned and the
-[research catalog](openspec/research/loop-use-cases.md) for the full backlog.
+The "top 5 after auto-docs" shortlist is complete. See the
+[roadmap](openspec/roadmap.md) for the backlog and the
+[research catalog](openspec/research/loop-use-cases.md) for the full survey.
 
 ## Project layout
 

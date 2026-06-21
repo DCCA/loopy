@@ -3,42 +3,37 @@
 Derived from the research catalog
 ([`research/loop-use-cases.md`](research/loop-use-cases.md)) and the "top 5 after
 auto-docs" shortlist. The shared core (contract, runner, guardrails, manifest)
-and the GitHub adapter (PR publishing + REST client) are reused by every loop.
+and the GitHub adapter (PR publishing, comment posting, REST client) are reused
+by every loop.
 
-## Implemented (specs are source of truth)
+## Implemented — the shortlist is complete (specs are source of truth)
 
-| Loop | Spec | `act` style | Status |
+| Loop | Spec | `act` style | Output |
 |------|------|-------------|--------|
-| `auto-docs` | [`specs/auto-docs-loop.md`](specs/auto-docs-loop.md) | AI (injected) | ✅ done |
-| `dep-updates` | [`specs/dep-updates-loop.md`](specs/dep-updates-loop.md) | deterministic | ✅ done |
-| `changelog` | [`specs/changelog-loop.md`](specs/changelog-loop.md) | deterministic | ✅ done |
+| `auto-docs` | [`specs/auto-docs-loop.md`](specs/auto-docs-loop.md) | AI (injected) | PR |
+| `dep-updates` | [`specs/dep-updates-loop.md`](specs/dep-updates-loop.md) | deterministic | PR |
+| `changelog` | [`specs/changelog-loop.md`](specs/changelog-loop.md) | deterministic | PR |
+| `pr-review` | [`specs/pr-review-loop.md`](specs/pr-review-loop.md) | AI (injected) | comment |
+| `test-coverage` | [`specs/test-coverage-loop.md`](specs/test-coverage-loop.md) | AI + self-validation | PR |
+| `security-remediation` | [`specs/security-remediation-loop.md`](specs/security-remediation-loop.md) | hybrid | PR (human-gated) |
 
-## Planned (proposals in `changes/`)
+All six follow the same contract and reuse the core unchanged. `pr-review`
+introduced the **comment output channel**; `test-coverage` introduced the
+**self-validation gate** (propose only if the suite passes and coverage rises).
 
-| Loop | Proposal | Why not yet built |
-|------|----------|-------------------|
-| `pr-review` | [`changes/add-pr-review-loop`](changes/add-pr-review-loop/proposal.md) | Needs a **comment output channel** (core extension) before the loop |
-| `test-coverage` | [`changes/add-test-coverage-loop`](changes/add-test-coverage-loop/proposal.md) | Needs coverage-tool integration + ability to run the suite to self-validate |
-| `security-remediation` | [`changes/add-security-remediation-loop`](changes/add-security-remediation-loop/proposal.md) | Needs scanner (SCA/SAST) integration + false-positive filtering |
-
-These three are blocked on **external boundaries** (a new output channel,
-coverage tooling, security scanners) that cannot be meaningfully validated in
-this repository today, so they are specified as OpenSpec change proposals and
-will be implemented once their boundaries are available. Each follows the same
-cycle the implemented loops did: `/openspec-proposal` → `/openspec-apply` →
-`/openspec-archive`.
+Each loop's external dependency (AI doc writer, registry, commit source, PR diff,
+coverage report, scanner findings, fixer) is an **injected boundary**, so the
+loops are fully unit-tested with fakes. Wiring the real boundaries (live GitHub
+API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 
 ## Backlog (catalogued, not yet proposed)
 
-From the research catalog: API reference sync, docstring coverage, deprecated-API
-codemod migration, dead-code cleanup, lint/format autofix, type-coverage ratchet,
-flaky-test quarantine, issue triage, stale management, release PR, org-wide config
-sync, SDK/spec regeneration, i18n key sync, secret-leak response, license/SBOM
-compliance, IaC drift, CI cost watch.
+From the research catalog, the next candidates: API reference sync, docstring
+coverage, deprecated-API codemod migration, dead-code cleanup, lint/format
+autofix, type-coverage ratchet, flaky-test quarantine, issue triage, stale
+management, release PR, org-wide config sync, SDK/spec regeneration, i18n key
+sync, secret-leak response (alert-first), license/SBOM compliance, IaC drift,
+CI cost watch.
 
-## Recommended build order
-
-1. `pr-review` — highest-frequency trigger, zero blast radius (advisory); the
-   output-channel extension it unlocks benefits future comment/issue loops.
-2. `test-coverage` — strong ROI, self-validating artifact.
-3. `security-remediation` — high value; reuses dep-updates semver for bumps.
+Each new loop follows the cycle the six implemented loops did:
+`/openspec-proposal` → `/openspec-apply` → `/openspec-archive`.

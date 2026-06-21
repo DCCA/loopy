@@ -1,0 +1,17 @@
+id: test-coverage
+
+trigger:
+  type: schedule
+  cron: "0 6 * * 1" # weekly, Mondays 06:00 UTC
+
+guardrails:
+  # Only ever writes test files.
+  pathAllowlist:
+    - "test/**"
+    - "tests/**"
+    - "**/*.test.ts"
+    - "**/*.spec.ts"
+  maxFiles: 20
+  skipIfOpenPr: true
+
+config: {}

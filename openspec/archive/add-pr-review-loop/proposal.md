@@ -2,7 +2,8 @@
 
 **Change ID:** `add-pr-review-loop`
 **Created:** 2026-06-21
-**Status:** Planned
+**Status:** Implementation Complete
+**Completed:** 2026-06-21
 
 ---
 
@@ -50,3 +51,11 @@ first phase of this proposal.
 |------|-------------|--------|------------|
 | AI false positives | Med | Low | Advisory only; clearly labeled as automated |
 | Output-model churn | Med | Med | Add channel additively; keep file→PR path unchanged |
+
+---
+
+## Archive Information
+
+**Archived:** 2026-06-21
+**Outcome:** Successfully implemented (injected boundaries, validated with fakes)
+**Verification:** typecheck + lint + 54 tests + build all passing
