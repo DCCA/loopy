@@ -1,0 +1,78 @@
+import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { run } from "../../src/cli/commands/run.js";
+import { main } from "../../src/cli/index.js";
+import { silentLogger } from "../../src/core/index.js";
+import type { GitHubClient } from "../../src/adapters/github-action/index.js";
+import type { RegistryClient } from "../../loops/dep-updates/index.js";
+
+// The bundled loops live at <repo>/loops during tests.
+const LOOPS_DIR = join(process.cwd(), "loops");
+
+function fakeClient(): GitHubClient {
+  return {
+    hasOpenLoopPr: vi.fn(async () => false),
+    createPullRequest: vi.fn(async () => ({ number: 5, url: "https://gh/pr/5" })),
+    postComment: vi.fn(async () => ({ url: "https://gh/pr/5#c" })),
+  };
+}
+
+const registry = (latest: Record<string, string>): RegistryClient => ({
+  getLatest: async (pkg) => latest[pkg] ?? null,
+});
+
+let repo: string;
+beforeEach(async () => {
+  repo = await mkdtemp(join(tmpdir(), "loopy-run-"));
+});
+afterEach(async () => {
+  await rm(repo, { recursive: true, force: true });
+});
+
+describe("loopy run", () => {
+  it("runs the dep-updates loop end-to-end and opens a PR", async () => {
+    await writeFile(
+      join(repo, "package.json"),
+      JSON.stringify({ name: "x", dependencies: { left: "^1.0.0" } }, null, 2),
+    );
+    const client = fakeClient();
+    const outcome = await run("dep-updates", {
+      cwd: repo,
+      loopsDir: LOOPS_DIR,
+      client,
+      registry: registry({ left: "1.2.0" }),
+      logger: silentLogger,
+    });
+    expect(outcome.ran).toBe(true);
+    expect(outcome.publish?.status).toBe("published");
+    expect(client.createPullRequest).toHaveBeenCalledOnce();
+  });
+
+  it("reports guidance for loops needing an AI provider", async () => {
+    const outcome = await run("auto-docs", { cwd: repo, logger: silentLogger });
+    expect(outcome.ran).toBe(false);
+    expect(outcome.message).toMatch(/needs an AI provider/);
+  });
+});
+
+describe("main()", () => {
+  it("prints help and exits 0 for `help`", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    expect(await main(["help"])).toBe(0);
+    log.mockRestore();
+  });
+
+  it("exits 1 for an unknown command", async () => {
+    const err = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(await main(["frobnicate"])).toBe(1);
+    err.mockRestore();
+  });
+
+  it("lists loops and exits 0", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    expect(await main(["list"])).toBe(0);
+    log.mockRestore();
+  });
+});
