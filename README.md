@@ -24,12 +24,15 @@ guardrail violation) it produces no output and never partially applies changes.
 
 ## Loops
 
-| Loop | What it does | Status |
-|------|--------------|--------|
-| [`auto-docs`](loops/auto-docs/README.md) | Opens a PR to update docs when the code surface drifts | ✅ implemented |
+| Loop | What it does | `act` | Status |
+|------|--------------|-------|--------|
+| [`auto-docs`](loops/auto-docs/README.md) | Opens a PR to update docs when the code surface drifts | AI | ✅ implemented |
+| [`dep-updates`](loops/dep-updates/README.md) | Opens one grouped PR bumping non-major dependency updates | deterministic | ✅ implemented |
+| [`changelog`](loops/changelog/README.md) | Opens a PR with a changelog entry from unreleased commits | deterministic | ✅ implemented |
+| `pr-review`, `test-coverage`, `security-remediation` | See roadmap | — | 📋 planned |
 
-More candidates are catalogued in
-[`openspec/research/loop-use-cases.md`](openspec/research/loop-use-cases.md).
+See the [roadmap](openspec/roadmap.md) for what's planned and the
+[research catalog](openspec/research/loop-use-cases.md) for the full backlog.
 
 ## Project layout
 

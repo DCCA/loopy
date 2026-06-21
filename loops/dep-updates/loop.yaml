@@ -1,0 +1,17 @@
+id: dep-updates
+
+trigger:
+  type: schedule
+  cron: "0 6 * * 1" # weekly, Mondays 06:00 UTC
+
+guardrails:
+  pathAllowlist:
+    - "package.json"
+  maxFiles: 1
+  skipIfOpenPr: true
+
+config:
+  manifestPath: "package.json"
+  includeDev: true
+  # Major updates are detected and reported but not applied unless enabled.
+  allowMajor: false

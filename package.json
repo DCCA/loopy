@@ -14,6 +14,14 @@
     "./loops/auto-docs": {
       "types": "./dist/loops/auto-docs/index.d.ts",
       "default": "./dist/loops/auto-docs/index.js"
+    },
+    "./loops/dep-updates": {
+      "types": "./dist/loops/dep-updates/index.d.ts",
+      "default": "./dist/loops/dep-updates/index.js"
+    },
+    "./loops/changelog": {
+      "types": "./dist/loops/changelog/index.d.ts",
+      "default": "./dist/loops/changelog/index.js"
     }
   },
   "files": [
