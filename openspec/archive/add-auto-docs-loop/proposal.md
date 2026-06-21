@@ -101,3 +101,26 @@ contract.
 | Over-broad changes (touches unrelated files) | Med | Med | Max-files cap + path allowlist + fail-safe (no partial apply) |
 | Core leaks auto-docs specifics | Low | Med | Keep runner manifest-driven; loop logic stays in the loop folder |
 | Provider/API cost or rate limits | Low | Med | Run on schedule (not per-commit); only invoke `act` when drift detected |
+
+---
+
+## Archive Information
+
+**Archived:** 2026-06-21
+**Duration:** same-day (created and completed 2026-06-21)
+**Outcome:** Successfully implemented
+
+### Files Added / Modified
+- `src/core/*` — loop contract, runner, guardrails, manifest loader, loggers
+- `src/adapters/github-action/*` — PR publishing, GitHub REST client, action runner
+- `loops/auto-docs/*` — loop.yaml, playbook.md, hooks, README, example workflow
+- `test/**` — 26 unit tests
+- Tooling: `package.json`, `tsconfig.json`, `eslint.config.js`, `vitest.config.ts`
+- `README.md` — rewritten to document loopy
+
+### Specs Updated
+- `openspec/specs/auto-docs-loop.md` — created from the delta (loop contract,
+  drift detection, PR-based output/idempotency, GitHub Action adapter)
+
+### Verification
+- typecheck, lint, 26 tests, and `tsc` build all passing
