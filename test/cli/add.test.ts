@@ -34,6 +34,7 @@ describe("loopy add", () => {
     expect(content).toContain("  pull_request:");
     expect(content).toContain("pull-requests: write");
     expect(content).toContain("OPENROUTER_API_KEY");
+    expect(content).toContain("LOOPY_PR_NUMBER: ${{ github.event.pull_request.number }}");
   });
 
   it("rejects an unknown loop with guidance", async () => {

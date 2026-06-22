@@ -10,6 +10,7 @@ import {
 } from "../../core/index.js";
 import {
   createGitHubRestClient,
+  createGitHubDiffProvider,
   publishRunResult,
   type GitHubClient,
   type PublishResult,
@@ -25,13 +26,17 @@ import {
   type CommitProvider,
 } from "../../../loops/changelog/index.js";
 import { createAutoDocsLoopFromManifest } from "../../../loops/auto-docs/index.js";
+import { createPrReviewLoopFromManifest, type DiffProvider } from "../../../loops/pr-review/index.js";
 import {
   createDocWriter,
+  createReviewer,
   createOpenAiCompatibleClient,
   resolveAiConfig,
   type AiClient,
 } from "../../ai/index.js";
 import { getEntry, type CatalogEntry } from "../catalog.js";
+
+type Env = Record<string, string | undefined>;
 
 export interface RunOptions {
   cwd?: string;
@@ -48,8 +53,9 @@ export interface RunOptions {
   registry?: RegistryClient;
   commitProvider?: CommitProvider;
   aiClient?: AiClient;
-  /** environment used for AI config resolution (defaults to process.env) */
-  env?: Record<string, string | undefined>;
+  diffProvider?: DiffProvider;
+  /** environment used for config resolution (defaults to process.env) */
+  env?: Env;
 }
 
 export interface RunOutcome {
@@ -57,6 +63,13 @@ export interface RunOutcome {
   run?: RunResult;
   publish?: PublishResult;
   message?: string;
+}
+
+interface BuildContext {
+  cwd: string;
+  env: Env;
+  options: RunOptions;
+  prNumber?: number;
 }
 
 const DEFAULT_LOOPS_DIR = fileURLToPath(new URL("../../../../loops", import.meta.url));
@@ -67,12 +80,15 @@ export async function run(loopId: string, options: RunOptions = {}): Promise<Run
     throw new Error(`unknown loop "${loopId}". Run "loopy list".`);
   }
 
+  const env = options.env ?? process.env;
   const cwd = options.cwd ?? process.cwd();
   const loopsDir = options.loopsDir ?? DEFAULT_LOOPS_DIR;
   const logger = options.logger ?? consoleLogger;
   const manifestPath = join(loopsDir, loopId, "loop.yaml");
+  const prNumber =
+    options.prNumber ?? (entry.output === "comment" ? resolvePrNumber(env) : undefined);
 
-  const built = await buildLoop(entry, manifestPath, cwd, options);
+  const built = await buildLoop(entry, manifestPath, { cwd, env, options, prNumber });
   if (typeof built === "string") {
     return { ran: false, message: built };
   }
@@ -85,11 +101,11 @@ export async function run(loopId: string, options: RunOptions = {}): Promise<Run
     return { ran: true, run: result, publish: { status: "no-op", reason: "dry-run" } };
   }
 
-  const client = options.client ?? clientFromEnv(options.env);
+  const client = options.client ?? clientFromEnv(env);
   const publish = await publishRunResult(result, client, {
     baseBranch: options.baseBranch,
     guardrails: built.guardrails,
-    prNumber: options.prNumber,
+    prNumber,
   });
   return { ran: true, run: result, publish };
 }
@@ -98,9 +114,9 @@ export async function run(loopId: string, options: RunOptions = {}): Promise<Run
 async function buildLoop(
   entry: CatalogEntry,
   manifestPath: string,
-  cwd: string,
-  options: RunOptions,
+  ctx: BuildContext,
 ): Promise<Loop | string> {
+  const { cwd, env, options, prNumber } = ctx;
   switch (entry.id) {
     case "dep-updates": {
       const manifest = await loadManifest(manifestPath);
@@ -115,16 +131,26 @@ async function buildLoop(
       });
     }
     case "auto-docs": {
-      const client = options.aiClient ?? aiClientFromEnv(options.env);
-      if (!client) {
-        return (
-          "`auto-docs` needs an AI provider. Set OPENROUTER_API_KEY (or LOOPY_AI_API_KEY / " +
-          "OPENAI_API_KEY) in the workflow; optionally LOOPY_AI_MODEL / LOOPY_AI_BASE_URL. " +
-          "See loops/auto-docs/README.md."
-        );
-      }
+      const client = options.aiClient ?? aiClientFromEnv(env);
+      if (!client) return aiGuidance("auto-docs");
       const manifest = await loadManifest(manifestPath);
       return createAutoDocsLoopFromManifest(manifest, { docWriter: createDocWriter(client) });
+    }
+    case "pr-review": {
+      const client = options.aiClient ?? aiClientFromEnv(env);
+      if (!client) return aiGuidance("pr-review");
+      if (prNumber == null) {
+        return (
+          "`pr-review` needs a target PR number. Set LOOPY_PR_NUMBER — the scaffolded " +
+          "workflow sets it from the pull_request event."
+        );
+      }
+      const diff = options.diffProvider ?? diffProviderFromEnv(env, prNumber);
+      if (!diff) {
+        return "`pr-review` needs GITHUB_TOKEN and GITHUB_REPOSITORY to fetch the PR diff.";
+      }
+      const manifest = await loadManifest(manifestPath);
+      return createPrReviewLoopFromManifest(manifest, { diff, reviewer: createReviewer(client) });
     }
     default:
       return (
@@ -134,8 +160,16 @@ async function buildLoop(
   }
 }
 
-function aiClientFromEnv(env?: Record<string, string | undefined>): AiClient | null {
-  const config = resolveAiConfig(env ?? process.env);
+function aiGuidance(loopId: string): string {
+  return (
+    `\`${loopId}\` needs an AI provider. Set OPENROUTER_API_KEY (or LOOPY_AI_API_KEY / ` +
+    `OPENAI_API_KEY) in the workflow; optionally LOOPY_AI_MODEL / LOOPY_AI_BASE_URL. ` +
+    `See loops/${loopId}/README.md.`
+  );
+}
+
+function aiClientFromEnv(env: Env): AiClient | null {
+  const config = resolveAiConfig(env);
   if (!config) return null;
   return createOpenAiCompatibleClient({
     apiKey: config.apiKey,
@@ -145,15 +179,33 @@ function aiClientFromEnv(env?: Record<string, string | undefined>): AiClient | n
   });
 }
 
-function clientFromEnv(env?: Record<string, string | undefined>): GitHubClient {
-  const source = env ?? process.env;
-  const token = source["GITHUB_TOKEN"];
-  const repo = source["GITHUB_REPOSITORY"];
-  if (!token || !repo || !repo.includes("/")) {
+function resolvePrNumber(env: Env): number | undefined {
+  const explicit = env["LOOPY_PR_NUMBER"];
+  if (explicit && /^\d+$/.test(explicit)) return Number(explicit);
+  const match = env["GITHUB_REF"] ? /refs\/pull\/(\d+)\/merge/.exec(env["GITHUB_REF"]) : null;
+  return match ? Number(match[1]) : undefined;
+}
+
+function ghParamsFromEnv(env: Env): { owner: string; repo: string; token: string } | null {
+  const token = env["GITHUB_TOKEN"];
+  const repository = env["GITHUB_REPOSITORY"];
+  if (!token || !repository || !repository.includes("/")) return null;
+  const [owner, repo] = repository.split("/");
+  return { owner: owner ?? "", repo: repo ?? "", token };
+}
+
+function diffProviderFromEnv(env: Env, prNumber: number): DiffProvider | null {
+  const gh = ghParamsFromEnv(env);
+  if (!gh) return null;
+  return createGitHubDiffProvider({ ...gh, prNumber });
+}
+
+function clientFromEnv(env: Env): GitHubClient {
+  const gh = ghParamsFromEnv(env);
+  if (!gh) {
     throw new Error(
       "GITHUB_TOKEN and GITHUB_REPOSITORY (owner/repo) are required to open a PR or comment.",
     );
   }
-  const [owner, name] = repo.split("/");
-  return createGitHubRestClient({ owner: owner ?? "", repo: name ?? "", token });
+  return createGitHubRestClient(gh);
 }

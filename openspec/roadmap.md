@@ -32,7 +32,8 @@ API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 |------------|------|--------|
 | 1-click loop import (`loopy add/list/run`) | [`specs/cli.md`](specs/cli.md) | ✅ done |
 | CI gate (typecheck/lint/test/build) | [`specs/ci.md`](specs/ci.md) | ✅ done |
-| AI provider (OpenRouter / OpenAI-compatible) | [`specs/ai-provider.md`](specs/ai-provider.md) | ✅ done (auto-docs turnkey) |
+| AI provider (OpenRouter / OpenAI-compatible) | [`specs/ai-provider.md`](specs/ai-provider.md) | ✅ done (auto-docs + pr-review turnkey) |
+| pr-review runtime (GitHub diff provider) | [`specs/pr-review-loop.md`](specs/pr-review-loop.md) | ✅ done |
 
 ## Backlog (catalogued, not yet proposed)
 

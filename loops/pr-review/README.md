@@ -21,8 +21,15 @@ rather than producing a pull request.
 
 Both boundaries are injected and testable:
 
-- `services.diff` — supplies the PR diff (GitHub API in real use)
-- `services.reviewer` — the AI review step
+- `services.diff` — supplies the PR diff. `loopy run` wires the GitHub-backed
+  `createGitHubDiffProvider` automatically.
+- `services.reviewer` — the AI review step (OpenRouter by default).
+
+## Turnkey via `loopy run`
+
+`loopy add pr-review` scaffolds a `pull_request` workflow that sets
+`OPENROUTER_API_KEY` and `LOOPY_PR_NUMBER` (from the event). `loopy run pr-review`
+then fetches the diff, reviews it, and posts the comment — no extra wiring.
 
 ## Notes
 

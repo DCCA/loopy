@@ -8,6 +8,7 @@ import { silentLogger } from "../../src/core/index.js";
 import type { GitHubClient } from "../../src/adapters/github-action/index.js";
 import type { RegistryClient } from "../../loops/dep-updates/index.js";
 import type { AiClient } from "../../src/ai/index.js";
+import type { DiffProvider } from "../../loops/pr-review/index.js";
 
 // The bundled loops live at <repo>/loops during tests.
 const LOOPS_DIR = join(process.cwd(), "loops");
@@ -79,6 +80,43 @@ describe("loopy run", () => {
     });
     expect(outcome.ran).toBe(true);
     expect(outcome.publish?.status).toBe("published");
+  });
+
+  it("runs pr-review end-to-end and posts a comment", async () => {
+    const diffProvider: DiffProvider = {
+      getDiff: async () => ({ files: [{ path: "src/a.ts", patch: "@@ +x" }] }),
+    };
+    const aiClient: AiClient = {
+      model: "test",
+      complete: async () => JSON.stringify({ summary: "looks fine", issues: [] }),
+    };
+    const client = fakeClient();
+    const outcome = await run("pr-review", {
+      cwd: repo,
+      loopsDir: LOOPS_DIR,
+      client,
+      aiClient,
+      diffProvider,
+      prNumber: 12,
+      logger: silentLogger,
+      env: {},
+    });
+    expect(outcome.ran).toBe(true);
+    expect(outcome.publish?.status).toBe("commented");
+    expect(client.postComment).toHaveBeenCalledOnce();
+  });
+
+  it("guides when pr-review has an AI key but no PR number", async () => {
+    const aiClient: AiClient = { model: "t", complete: async () => "{}" };
+    const outcome = await run("pr-review", {
+      cwd: repo,
+      loopsDir: LOOPS_DIR,
+      aiClient,
+      logger: silentLogger,
+      env: {},
+    });
+    expect(outcome.ran).toBe(false);
+    expect(outcome.message).toMatch(/PR number/);
   });
 });
 
