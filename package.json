@@ -41,6 +41,10 @@
     "./loops/kb-gap": {
       "types": "./dist/loops/kb-gap/index.d.ts",
       "default": "./dist/loops/kb-gap/index.js"
+    },
+    "./loops/experiment": {
+      "types": "./dist/loops/experiment/index.d.ts",
+      "default": "./dist/loops/experiment/index.js"
     }
   },
   "files": [

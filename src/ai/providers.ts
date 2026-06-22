@@ -9,6 +9,11 @@ import type { Reviewer, ReviewResult } from "../../loops/pr-review/index.js";
 import type { CoverageGap } from "../../loops/test-coverage/index.js";
 import type { TestGenerator } from "../../loops/test-coverage/index.js";
 import type { ArticleWriter, KbGap } from "../../loops/kb-gap/index.js";
+import type {
+  ExperimentDesign,
+  ExperimentDesigner,
+  Hypothesis,
+} from "../../loops/experiment/index.js";
 
 /** AI-backed doc writer for the auto-docs loop. */
 export function createDocWriter(client: AiClient): DocWriter {
@@ -96,6 +101,25 @@ export function createArticleWriter(client: AiClient, kbDir = "docs/kb"): Articl
       ],
     });
     return parseJsonResponse<Array<{ path: string; contents: string }>>(text);
+  };
+}
+
+/** AI-backed experiment designer for the experiment-orchestrator loop. */
+export function createExperimentDesigner(client: AiClient): ExperimentDesigner {
+  return async (hypothesis: Hypothesis): Promise<ExperimentDesign> => {
+    const system =
+      "You are an experimentation expert. Design a clean A/B test for the hypothesis. " +
+      "Respond ONLY with JSON: {\"variants\": string[], \"metric\": string, " +
+      "\"guardrailMetrics\": string[], \"minSampleSize\": number, \"durationDays\": number}. " +
+      "Always include guardrail metrics and a realistic sample size and duration.";
+    const user = JSON.stringify(hypothesis);
+    const text = await client.complete({
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    });
+    return parseJsonResponse<ExperimentDesign>(text);
   };
 }
 
