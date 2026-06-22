@@ -8,6 +8,7 @@ import type { DocChange, DocWriter, DocWriterInput } from "../../loops/auto-docs
 import type { Reviewer, ReviewResult } from "../../loops/pr-review/index.js";
 import type { CoverageGap } from "../../loops/test-coverage/index.js";
 import type { TestGenerator } from "../../loops/test-coverage/index.js";
+import type { ArticleWriter, KbGap } from "../../loops/kb-gap/index.js";
 
 /** AI-backed doc writer for the auto-docs loop. */
 export function createDocWriter(client: AiClient): DocWriter {
@@ -68,6 +69,33 @@ export function createTestGenerator(client: AiClient): TestGenerator {
     });
     const files = parseJsonResponse<Array<{ path: string; contents: string }>>(text);
     return files.map((f) => ({ path: f.path, op: "write", contents: f.contents }));
+  };
+}
+
+/** AI-backed article writer for the kb-gap loop. */
+export function createArticleWriter(client: AiClient, kbDir = "docs/kb"): ArticleWriter {
+  return async (gaps: KbGap[]) => {
+    const system =
+      "You write knowledge-base articles that resolve recurring support topics. Write one " +
+      "accurate Markdown article per gap, grounded in the provided resolved-ticket resolutions — " +
+      `do not invent product behavior. Put each file under "${kbDir}/" with a kebab-case ".md" ` +
+      'filename. Respond ONLY with JSON: an array of {"path","contents"}. Return [] if you cannot ' +
+      "write a confident article.";
+    const user = JSON.stringify({
+      kbDir,
+      gaps: gaps.map((g) => ({
+        topic: g.topic,
+        count: g.count,
+        examples: g.tickets.slice(0, 5).map((t) => ({ question: t.question, resolution: t.resolution })),
+      })),
+    });
+    const text = await client.complete({
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+    });
+    return parseJsonResponse<Array<{ path: string; contents: string }>>(text);
   };
 }
 

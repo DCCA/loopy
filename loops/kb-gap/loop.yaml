@@ -1,0 +1,15 @@
+id: kb-gap
+
+trigger:
+  type: schedule
+  cron: "0 6 * * 1" # weekly, Mondays 06:00 UTC
+
+guardrails:
+  pathAllowlist:
+    - "docs/**"
+  maxFiles: 20
+  skipIfOpenPr: true
+
+config:
+  kbDir: "docs/kb"
+  minTickets: 3

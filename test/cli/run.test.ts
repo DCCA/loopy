@@ -9,6 +9,7 @@ import type { GitHubClient } from "../../src/adapters/github-action/index.js";
 import type { RegistryClient } from "../../loops/dep-updates/index.js";
 import type { AiClient } from "../../src/ai/index.js";
 import type { DiffProvider } from "../../loops/pr-review/index.js";
+import type { TicketSource } from "../../loops/kb-gap/index.js";
 
 // The bundled loops live at <repo>/loops during tests.
 const LOOPS_DIR = join(process.cwd(), "loops");
@@ -104,6 +105,49 @@ describe("loopy run", () => {
     expect(outcome.ran).toBe(true);
     expect(outcome.publish?.status).toBe("commented");
     expect(client.postComment).toHaveBeenCalledOnce();
+  });
+
+  it("runs kb-gap end-to-end and opens a PR", async () => {
+    const tickets: TicketSource = {
+      listResolved: async () => [
+        { id: "1", question: "how to reset my password", topic: "password reset" },
+        { id: "2", question: "reset password help", topic: "password reset" },
+        { id: "3", question: "cannot reset password", topic: "password reset" },
+      ],
+    };
+    const aiClient: AiClient = {
+      model: "test",
+      complete: async () =>
+        JSON.stringify([{ path: "docs/kb/password-reset.md", contents: "# Password reset\n..." }]),
+    };
+    const client = fakeClient();
+    const outcome = await run("kb-gap", {
+      cwd: repo,
+      loopsDir: LOOPS_DIR,
+      client,
+      aiClient,
+      ticketSource: tickets,
+      coveredTopics: async () => [],
+      logger: silentLogger,
+      env: {},
+    });
+    expect(outcome.ran).toBe(true);
+    expect(outcome.publish?.status).toBe("published");
+    const change = outcome.run?.changes?.[0];
+    expect(change?.path).toBe("docs/kb/password-reset.md");
+  });
+
+  it("guides when kb-gap has an AI key but no ticket source", async () => {
+    const aiClient: AiClient = { model: "t", complete: async () => "[]" };
+    const outcome = await run("kb-gap", {
+      cwd: repo,
+      loopsDir: LOOPS_DIR,
+      aiClient,
+      logger: silentLogger,
+      env: {},
+    });
+    expect(outcome.ran).toBe(false);
+    expect(outcome.message).toMatch(/LOOPY_TICKETS_FILE/);
   });
 
   it("guides when pr-review has an AI key but no PR number", async () => {

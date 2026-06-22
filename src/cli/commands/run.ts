@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
+import { readFile, readdir } from "node:fs/promises";
 import {
   consoleLogger,
   loadManifest,
@@ -28,8 +29,14 @@ import {
 import { createAutoDocsLoopFromManifest } from "../../../loops/auto-docs/index.js";
 import { createPrReviewLoopFromManifest, type DiffProvider } from "../../../loops/pr-review/index.js";
 import {
+  createKbGapLoopFromManifest,
+  type Ticket,
+  type TicketSource,
+} from "../../../loops/kb-gap/index.js";
+import {
   createDocWriter,
   createReviewer,
+  createArticleWriter,
   createOpenAiCompatibleClient,
   resolveAiConfig,
   type AiClient,
@@ -54,6 +61,8 @@ export interface RunOptions {
   commitProvider?: CommitProvider;
   aiClient?: AiClient;
   diffProvider?: DiffProvider;
+  ticketSource?: TicketSource;
+  coveredTopics?: () => Promise<string[]>;
   /** environment used for config resolution (defaults to process.env) */
   env?: Env;
 }
@@ -152,6 +161,25 @@ async function buildLoop(
       const manifest = await loadManifest(manifestPath);
       return createPrReviewLoopFromManifest(manifest, { diff, reviewer: createReviewer(client) });
     }
+    case "kb-gap": {
+      const client = options.aiClient ?? aiClientFromEnv(env);
+      if (!client) return aiGuidance("kb-gap");
+      const tickets = options.ticketSource ?? ticketSourceFromEnv(env);
+      if (!tickets) {
+        return (
+          "`kb-gap` needs resolved tickets. Set LOOPY_TICKETS_FILE to a JSON file containing an " +
+          "array of { id, question, resolution?, topic? }."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      const kbDir = typeof manifest.config["kbDir"] === "string" ? manifest.config["kbDir"] : "docs/kb";
+      const coveredTopics = options.coveredTopics ?? (() => coveredFromKbDir(cwd, kbDir));
+      return createKbGapLoopFromManifest(manifest, {
+        tickets,
+        coveredTopics,
+        articleWriter: createArticleWriter(client, kbDir),
+      });
+    }
     default:
       return (
         `\`${entry.id}\` is not runnable via the CLI yet (needs additional boundaries — ` +
@@ -198,6 +226,29 @@ function diffProviderFromEnv(env: Env, prNumber: number): DiffProvider | null {
   const gh = ghParamsFromEnv(env);
   if (!gh) return null;
   return createGitHubDiffProvider({ ...gh, prNumber });
+}
+
+function ticketSourceFromEnv(env: Env): TicketSource | null {
+  const file = env["LOOPY_TICKETS_FILE"];
+  if (!file) return null;
+  return {
+    listResolved: async (): Promise<Ticket[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as unknown;
+      return Array.isArray(parsed) ? (parsed as Ticket[]) : [];
+    },
+  };
+}
+
+/** Treat existing KB markdown filenames as already-covered topics. */
+async function coveredFromKbDir(cwd: string, kbDir: string): Promise<string[]> {
+  try {
+    const entries = await readdir(join(cwd, kbDir));
+    return entries
+      .filter((f) => f.endsWith(".md"))
+      .map((f) => f.replace(/\.md$/, "").replace(/[-_]+/g, " "));
+  } catch {
+    return [];
+  }
 }
 
 function clientFromEnv(env: Env): GitHubClient {
