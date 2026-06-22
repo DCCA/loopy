@@ -46,11 +46,15 @@ compliance). These need new framework primitives — durable state/memory,
 resumable multi-step orchestration, long-horizon scheduling, human-approval
 gates, and non-PR output adapters.
 
-**Delivered so far:** the **KB-Gap Self-Heal** loop (first product-level wedge,
-shipped) and the **long-horizon primitives** (durable state, approval gates,
-resumable plans) in `src/core/longrun/`. Remaining wedge candidates:
-Experiment Lifecycle Orchestrator and Metric Anomaly Narrator (which can now be
-built on `runPlan` + gates + state).
+**Delivered so far:** the **long-horizon primitives** (durable state, approval
+gates, resumable plans) in `src/core/longrun/`; the **KB-Gap Self-Heal** loop
+(first product-level wedge, turnkey); and the **Experiment Lifecycle
+Orchestrator** ([`specs/experiment-orchestrator.md`](specs/experiment-orchestrator.md))
+— the flagship long-horizon loop on `runPlan` + gates + state (design → approve →
+launch → bake → readout → decide). Remaining candidates on the same primitives:
+Metric Anomaly → Root-Cause Narrator, Incident Action-Item/Recurrence, Churn →
+Intervention. Cross-cutting follow-ups: non-PR output adapters (issue tracker,
+experimentation platform, dashboards) and a `loopy advance <plan>` CLI verb.
 
 ## Backlog (catalogued, not yet proposed)
 
