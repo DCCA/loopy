@@ -82,9 +82,10 @@ OpenAI-compatible endpoint/model works:
 | `LOOPY_AI_BASE_URL` | `https://openrouter.ai/api/v1` | OpenAI-compatible base URL |
 | `LOOPY_AI_MODEL` | `z-ai/glm-5.2` | model id |
 
-`dep-updates` and `changelog` are deterministic (no AI). `auto-docs` is turnkey
-once an AI key is set; `pr-review` and `test-coverage` also need their non-AI
-boundaries (PR diff, coverage report) wired — see each loop's README.
+`dep-updates` and `changelog` are deterministic (no AI). `auto-docs` and
+`pr-review` are turnkey once an AI key is set (pr-review runs on the
+`pull_request` event and posts an advisory comment); `test-coverage` also needs
+its coverage boundary wired — see each loop's README.
 
 For a fully manual setup instead, see
 [`loops/auto-docs/example.github-workflow.yml`](loops/auto-docs/example.github-workflow.yml).

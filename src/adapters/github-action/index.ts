@@ -103,5 +103,7 @@ export async function publishRunResult(
 
 export { createGitHubRestClient } from "./github-client.js";
 export type { GitHubRestOptions } from "./github-client.js";
+export { createGitHubDiffProvider } from "./diff.js";
+export type { GitHubDiffOptions } from "./diff.js";
 export { runAutoDocsAction } from "./run.js";
 export type { RunAutoDocsOptions, AutoDocsActionResult } from "./run.js";

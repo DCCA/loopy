@@ -7,10 +7,13 @@ export function renderWorkflow(entry: CatalogEntry): string {
     entry.output === "comment"
       ? "  pull-requests: write\n  contents: read"
       : "  contents: write\n  pull-requests: write";
-  const env = entry.secrets
+  const envLines = entry.secrets
     .map((s) => `          ${s}: \${{ secrets.${s} }}`)
-    .concat(["          GITHUB_REPOSITORY: ${{ github.repository }}"])
-    .join("\n");
+    .concat(["          GITHUB_REPOSITORY: ${{ github.repository }}"]);
+  if (entry.trigger.kind === "event") {
+    envLines.push("          LOOPY_PR_NUMBER: ${{ github.event.pull_request.number }}");
+  }
+  const env = envLines.join("\n");
 
   return `# Added by \`loopy add ${entry.id}\`. Ready to run.
 name: loopy ${entry.id}
