@@ -53,6 +53,13 @@ export const CATALOG: CatalogEntry[] = [
     secrets: [GH, AI],
   },
   {
+    id: "kb-gap",
+    description: "Draft KB articles for recurring support topics (self-heal docs)",
+    trigger: { kind: "schedule", cron: WEEKLY },
+    output: "pull-request",
+    secrets: [GH, AI],
+  },
+  {
     id: "test-coverage",
     description: "Backfill tests for uncovered changed lines (self-validating)",
     trigger: { kind: "schedule", cron: WEEKLY },

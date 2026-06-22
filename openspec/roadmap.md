@@ -16,6 +16,7 @@ by every loop.
 | `pr-review` | [`specs/pr-review-loop.md`](specs/pr-review-loop.md) | AI (injected) | comment |
 | `test-coverage` | [`specs/test-coverage-loop.md`](specs/test-coverage-loop.md) | AI + self-validation | PR |
 | `security-remediation` | [`specs/security-remediation-loop.md`](specs/security-remediation-loop.md) | hybrid | PR (human-gated) |
+| `kb-gap` | [`specs/kb-gap-loop.md`](specs/kb-gap-loop.md) | AI | PR |
 
 All six follow the same contract and reuse the core unchanged. `pr-review`
 introduced the **comment output channel**; `test-coverage` introduced the
@@ -34,6 +35,22 @@ API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 | CI gate (typecheck/lint/test/build) | [`specs/ci.md`](specs/ci.md) | ✅ done |
 | AI provider (OpenRouter / OpenAI-compatible) | [`specs/ai-provider.md`](specs/ai-provider.md) | ✅ done (auto-docs + pr-review turnkey) |
 | pr-review runtime (GitHub diff provider) | [`specs/pr-review-loop.md`](specs/pr-review-loop.md) | ✅ done |
+| Long-horizon primitives (state, gates, resumable plans) | [`specs/long-horizon-runtime.md`](specs/long-horizon-runtime.md) | ✅ done |
+
+## Next horizon: product-level loops
+
+Beyond repo maintenance, [`research/product-level-loops.md`](research/product-level-loops.md)
+explores **complex, long-horizon loops** that act on the product/business
+(discovery, experimentation, incidents, analytics, retention, support, FinOps,
+compliance). These need new framework primitives — durable state/memory,
+resumable multi-step orchestration, long-horizon scheduling, human-approval
+gates, and non-PR output adapters.
+
+**Delivered so far:** the **KB-Gap Self-Heal** loop (first product-level wedge,
+shipped) and the **long-horizon primitives** (durable state, approval gates,
+resumable plans) in `src/core/longrun/`. Remaining wedge candidates:
+Experiment Lifecycle Orchestrator and Metric Anomaly Narrator (which can now be
+built on `runPlan` + gates + state).
 
 ## Backlog (catalogued, not yet proposed)
 

@@ -37,6 +37,10 @@
     "./loops/security-remediation": {
       "types": "./dist/loops/security-remediation/index.d.ts",
       "default": "./dist/loops/security-remediation/index.js"
+    },
+    "./loops/kb-gap": {
+      "types": "./dist/loops/kb-gap/index.d.ts",
+      "default": "./dist/loops/kb-gap/index.js"
     }
   },
   "files": [

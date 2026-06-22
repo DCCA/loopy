@@ -32,6 +32,7 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`pr-review`](loops/pr-review/README.md) | An advisory automated review comment on a PR | AI | comment |
 | [`test-coverage`](loops/test-coverage/README.md) | Backfills tests for uncovered changed lines (self-validating) | AI | PR |
 | [`security-remediation`](loops/security-remediation/README.md) | Human-gated fixes for security findings above a threshold | hybrid | PR |
+| [`kb-gap`](loops/kb-gap/README.md) | Drafts KB articles for recurring support topics (self-heal docs) | AI | PR |
 
 The "top 5 after auto-docs" shortlist is complete. See the
 [roadmap](openspec/roadmap.md) for the backlog and the
@@ -41,10 +42,22 @@ The "top 5 after auto-docs" shortlist is complete. See the
 
 ```
 src/core/                  loop contract, runner, guardrails, manifest loader
+src/core/longrun/          long-horizon primitives: durable state, approval gates, resumable plans
 src/adapters/github-action GitHub Action adapter + REST client + PR publishing
+src/ai/                    OpenAI-compatible AI provider (defaults to OpenRouter) + boundary adapters
 loops/<name>/              the catalog (loop.yaml + playbook.md + hooks/)
 openspec/                  spec-driven development workflow (specs, changes, research)
 ```
+
+## Long-horizon loops (foundations)
+
+Beyond the single-shot loops above, `src/core/longrun/` provides the primitives
+for **stateful, multi-step, long-horizon** product-level loops (see
+[`openspec/research/product-level-loops.md`](openspec/research/product-level-loops.md)):
+a durable **state store** (memory across runs), a first-class **approval gate**
+(human checkpoints), and **resumable multi-step plans** (`runPlan`) with
+wait-states and gate-blocking. These are the substrate for ambitious loops like
+experiment orchestration, incident coordination, and churn intervention.
 
 ## Development
 
