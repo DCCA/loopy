@@ -35,6 +35,16 @@ API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 | AI provider (OpenRouter / OpenAI-compatible) | [`specs/ai-provider.md`](specs/ai-provider.md) | ✅ done (auto-docs + pr-review turnkey) |
 | pr-review runtime (GitHub diff provider) | [`specs/pr-review-loop.md`](specs/pr-review-loop.md) | ✅ done |
 
+## Next horizon: product-level loops
+
+Beyond repo maintenance, [`research/product-level-loops.md`](research/product-level-loops.md)
+explores **complex, long-horizon loops** that act on the product/business
+(discovery, experimentation, incidents, analytics, retention, support, FinOps,
+compliance). These need new framework primitives — durable state/memory,
+resumable multi-step orchestration, long-horizon scheduling, human-approval
+gates, and non-PR output adapters. Top wedge candidates: KB-Gap Self-Heal,
+Experiment Lifecycle Orchestrator, Metric Anomaly Narrator.
+
 ## Backlog (catalogued, not yet proposed)
 
 From the research catalog, the next candidates: API reference sync, docstring
