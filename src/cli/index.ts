@@ -10,6 +10,7 @@ Usage:
   loopy add <loop>     Scaffold a ready-to-run workflow for a loop (1-click import)
   loopy list           List available loops
   loopy run <loop>     Run a loop end-to-end (used by the scaffolded workflow)
+                       Pass --dry-run to compute the result without publishing
   loopy help           Show this help
 
 Examples:
@@ -47,16 +48,27 @@ export async function main(argv: string[]): Promise<number> {
     case "run": {
       const loopId = rest[0];
       if (!loopId) {
-        console.error("usage: loopy run <loop>");
+        console.error("usage: loopy run <loop> [--dry-run]");
         return 1;
       }
+      const dryRun = rest.includes("--dry-run");
       try {
-        const outcome = await run(loopId);
+        const outcome = await run(loopId, { dryRun });
         if (!outcome.ran) {
           console.error(outcome.message ?? "loop did not run");
           return 1;
         }
         console.log(`${loopId}: ${outcome.run?.status} → ${outcome.publish?.status}`);
+        if (dryRun && outcome.run?.status === "produced") {
+          const r = outcome.run;
+          if (r.outputKind === "pull-request") {
+            console.log(`  would open a PR with ${r.changes?.length ?? 0} file change(s):`);
+            for (const c of r.changes ?? []) console.log(`    ${c.op} ${c.path}`);
+          } else if (r.outputKind === "comment") {
+            const firstLine = (r.comment ?? "").split("\n").find((l) => l.trim().length > 0) ?? "";
+            console.log(`  would post a comment: ${firstLine}`);
+          }
+        }
         return 0;
       } catch (err) {
         console.error(err instanceof Error ? err.message : String(err));
