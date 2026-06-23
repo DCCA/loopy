@@ -37,6 +37,15 @@ API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 | pr-review runtime (GitHub diff provider) | [`specs/pr-review-loop.md`](specs/pr-review-loop.md) | ✅ done |
 | Long-horizon primitives (state, gates, resumable plans) | [`specs/long-horizon-runtime.md`](specs/long-horizon-runtime.md) | ✅ done |
 
+## Complex / stateful loops (deep dive #3)
+
+[`research/complex-loops.md`](research/complex-loops.md) ranked new complex loops.
+Shipped from the top of the ranking: **flake-quarantine** (#1 — first loop to use
+the durable `StateStore`), **release-train** (#3 — dogfoods loopy's own releases;
+see `.github/workflows/dogfood.yml`), and **license-sbom-drift** (#5). Next from
+the ranking: **codemod-campaign** (cross-PR campaign on `runPlan`+ledger),
+**prompt-eval-gate**, **model-upgrade-migration**.
+
 ## Next horizon: product-level loops
 
 Beyond repo maintenance, [`research/product-level-loops.md`](research/product-level-loops.md)

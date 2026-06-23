@@ -53,6 +53,18 @@
     "./loops/incident-followup": {
       "types": "./dist/loops/incident-followup/index.d.ts",
       "default": "./dist/loops/incident-followup/index.js"
+    },
+    "./loops/flake-quarantine": {
+      "types": "./dist/loops/flake-quarantine/index.d.ts",
+      "default": "./dist/loops/flake-quarantine/index.js"
+    },
+    "./loops/release-train": {
+      "types": "./dist/loops/release-train/index.d.ts",
+      "default": "./dist/loops/release-train/index.js"
+    },
+    "./loops/license-sbom-drift": {
+      "types": "./dist/loops/license-sbom-drift/index.d.ts",
+      "default": "./dist/loops/license-sbom-drift/index.js"
     }
   },
   "files": [

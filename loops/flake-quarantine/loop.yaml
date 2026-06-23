@@ -1,0 +1,20 @@
+id: flake-quarantine
+
+trigger:
+  type: schedule
+  cron: "0 7 * * *" # daily, 07:00 UTC
+
+guardrails:
+  pathAllowlist:
+    - "quarantine.json"
+    - "reports/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  quarantinePath: "quarantine.json"
+  reportPath: "reports/flaky-tests.md"
+  # Retained observations per test, and the thresholds that gate a verdict.
+  window: 20
+  minObservations: 5
+  flakeThreshold: 0.2
