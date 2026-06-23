@@ -17,4 +17,11 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // The dogfood harness is plain Node ESM (not part of the TS build).
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: { console: "readonly", process: "readonly" },
+    },
+  },
 );

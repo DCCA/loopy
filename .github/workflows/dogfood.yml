@@ -2,21 +2,38 @@ name: dogfood
 
 # loopy dogfooding its own loops on this repo, via the locally-built CLI
 # (npx isn't used because loopy isn't published to npm yet).
-#
-# Manual by default to avoid surprise PRs. To let loopy manage its own rolling
-# Release PR automatically, uncomment the `push` trigger.
+
 on:
+  pull_request: {}
+  push:
+    branches: [main]
   workflow_dispatch: {}
-  # push:
-  #   branches: [main]
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
-  release-train:
+  # Exercises EVERY loop end-to-end (detect → act → guardrails → runner) with
+  # realistic example inputs, in dry-run — no network, no PRs, no secrets.
+  all-loops:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - run: npm run build
+      - name: Dogfood all loops
+        run: npm run dogfood
+
+  # Lets loopy open its own real rolling Release PR. Manual only (needs write).
+  release-train:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:

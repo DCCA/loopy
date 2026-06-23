@@ -129,7 +129,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "dogfood": "node scripts/dogfood.mjs"
   },
   "dependencies": {
     "yaml": "^2.5.1"
