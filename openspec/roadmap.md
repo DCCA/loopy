@@ -45,7 +45,9 @@ the durable `StateStore`), **release-train** (#3 — dogfoods loopy's own releas
 see `.github/workflows/dogfood.yml`), **license-sbom-drift** (#5), and
 **codemod-campaign** (#2 — cross-PR campaign: ledger in `StateStore` + pilot
 `Gate` + throttle + reconcile; see [`specs/codemod-campaign.md`](specs/codemod-campaign.md)).
-Next from the ranking: **prompt-eval-gate**, **model-upgrade-migration**.
+Also shipped: **prompt-eval-gate** (#4 — LLMOps regression gate; baseline in
+`StateStore`, human-gated promotion; loopy dogfoods it on its own AI loops). Next
+from the ranking: **model-upgrade-migration**, then api-deprecation-rollout.
 
 ## Next horizon: product-level loops
 

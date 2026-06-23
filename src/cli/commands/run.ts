@@ -60,6 +60,11 @@ import {
 } from "../../../loops/license-sbom-drift/index.js";
 import { createFileStateStore, type StateStore } from "../../core/index.js";
 import {
+  createPromptEvalLoopFromManifest,
+  type EvalCase,
+  type EvalSource,
+} from "../../../loops/prompt-eval-gate/index.js";
+import {
   createDocWriter,
   createReviewer,
   createArticleWriter,
@@ -96,6 +101,7 @@ export interface RunOptions {
   readQuarantine?: () => Promise<string[]>;
   releaseSource?: ReleaseSource;
   sbomSource?: SbomSource;
+  evalSource?: EvalSource;
   /** environment used for config resolution (defaults to process.env) */
   env?: Env;
 }
@@ -128,7 +134,10 @@ export async function run(loopId: string, options: RunOptions = {}): Promise<Run
   const logger = options.logger ?? consoleLogger;
   const manifestPath = join(loopsDir, loopId, "loop.yaml");
   const prNumber =
-    options.prNumber ?? (entry.output === "comment" ? resolvePrNumber(env) : undefined);
+    options.prNumber ??
+    (entry.output === "comment" || entry.trigger.kind === "event"
+      ? resolvePrNumber(env)
+      : undefined);
 
   const built = await buildLoop(entry, manifestPath, { cwd, env, options, prNumber });
   if (typeof built === "string") {
@@ -268,6 +277,21 @@ async function buildLoop(
       const manifest = await loadManifest(manifestPath);
       return createLicenseSbomLoopFromManifest(manifest, { sbom });
     }
+    case "prompt-eval-gate": {
+      const client = options.aiClient ?? aiClientFromEnv(env);
+      if (!client) return aiGuidance("prompt-eval-gate");
+      const evals = options.evalSource ?? evalSourceFromEnv(env);
+      if (!evals) {
+        return (
+          "`prompt-eval-gate` needs an eval set. Set LOOPY_EVAL_CASES_FILE to a JSON file " +
+          "containing an array of { id, input, expect }."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      const model = (input: string) => client.complete({ messages: [{ role: "user", content: input }] });
+      const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
+      return createPromptEvalLoopFromManifest(manifest, { model, evals, state });
+    }
     default:
       return (
         `\`${entry.id}\` is not runnable via the CLI yet (needs additional boundaries — ` +
@@ -386,6 +410,17 @@ function releaseSourceFromGit(cwd: string): ReleaseSource {
       } catch {
         return "0.0.0";
       }
+    },
+  };
+}
+
+function evalSourceFromEnv(env: Env): EvalSource | null {
+  const file = env["LOOPY_EVAL_CASES_FILE"];
+  if (!file) return null;
+  return {
+    cases: async (): Promise<EvalCase[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as unknown;
+      return Array.isArray(parsed) ? (parsed as EvalCase[]) : [];
     },
   };
 }

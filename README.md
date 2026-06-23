@@ -38,6 +38,7 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`flake-quarantine`](loops/flake-quarantine/README.md) | Score flaky tests across runs (stateful) and quarantine the worst | deterministic + state | PR |
 | [`release-train`](loops/release-train/README.md) | Rolling Release PR (version + changelog) from conventional commits | deterministic | PR |
 | [`license-sbom-drift`](loops/license-sbom-drift/README.md) | Flag dependency licenses outside the allowlist | deterministic | PR |
+| [`prompt-eval-gate`](loops/prompt-eval-gate/README.md) | Regression-gate prompts vs a baseline (stateful); gated promotion | AI + state | comment / PR |
 
 Plus two **long-horizon** loops on the `longrun` primitives (durable state,
 approval gates, resumable advancement): the
