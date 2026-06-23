@@ -76,6 +76,25 @@ import {
   type RunbookSource,
 } from "../../../loops/runbook-freshness/index.js";
 import {
+  createTestImpactBudgetLoopFromManifest,
+  type TestTiming,
+  type TimingSource,
+} from "../../../loops/test-impact-budget/index.js";
+import {
+  createDataContractGuardLoopFromManifest,
+  type Schema,
+  type SchemaSource,
+} from "../../../loops/data-contract-guard/index.js";
+import {
+  createCostGuardrailLoopFromManifest,
+  type ResourceUsage,
+  type UsageSource,
+} from "../../../loops/cost-guardrail/index.js";
+import {
+  createEvalSetDriftLoopFromManifest,
+  type DriftSource,
+} from "../../../loops/eval-set-drift/index.js";
+import {
   createDocWriter,
   createReviewer,
   createArticleWriter,
@@ -367,6 +386,66 @@ async function buildLoop(
         },
       };
       return createRunbookFreshnessLoopFromManifest(await loadManifest(manifestPath), { source });
+    }
+    case "test-impact-budget": {
+      const file = env["LOOPY_TEST_TIMINGS_FILE"];
+      if (!file) {
+        return "`test-impact-budget` needs test timings. Set LOOPY_TEST_TIMINGS_FILE to a JSON array of { testId, durationMs }.";
+      }
+      const timings: TimingSource = {
+        latest: async () => {
+          const j = (await readJson(file)) as TestTiming[];
+          return Array.isArray(j) ? j : [];
+        },
+      };
+      const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
+      return createTestImpactBudgetLoopFromManifest(await loadManifest(manifestPath), { timings, state });
+    }
+    case "data-contract-guard": {
+      const file = env["LOOPY_SCHEMA_FILE"];
+      if (!file) {
+        return "`data-contract-guard` needs a schema. Set LOOPY_SCHEMA_FILE to a JSON file { fields: [{ name, type, required }] }.";
+      }
+      const source: SchemaSource = {
+        current: async () => {
+          const j = (await readJson(file)) as Schema;
+          return j && Array.isArray(j.fields) ? j : { fields: [] };
+        },
+      };
+      const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
+      return createDataContractGuardLoopFromManifest(await loadManifest(manifestPath), { source, state });
+    }
+    case "cost-guardrail": {
+      const file = env["LOOPY_USAGE_FILE"];
+      if (!file) {
+        return "`cost-guardrail` needs usage data. Set LOOPY_USAGE_FILE to a JSON array of { id, utilization, monthlyCost }.";
+      }
+      const usage: UsageSource = {
+        current: async () => {
+          const j = (await readJson(file)) as ResourceUsage[];
+          return Array.isArray(j) ? j : [];
+        },
+      };
+      const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
+      return createCostGuardrailLoopFromManifest(await loadManifest(manifestPath), { usage, state });
+    }
+    case "eval-set-drift": {
+      const file = env["LOOPY_EVAL_DRIFT_FILE"];
+      if (!file) {
+        return "`eval-set-drift` needs category data. Set LOOPY_EVAL_DRIFT_FILE to a JSON file { evalCategories: string[], productionCategories: string[] }.";
+      }
+      const source: DriftSource = {
+        evalCategories: async () => {
+          const j = (await readJson(file)) as { evalCategories?: string[] };
+          return Array.isArray(j.evalCategories) ? j.evalCategories : [];
+        },
+        productionCategories: async () => {
+          const j = (await readJson(file)) as { productionCategories?: string[] };
+          return Array.isArray(j.productionCategories) ? j.productionCategories : [];
+        },
+      };
+      const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
+      return createEvalSetDriftLoopFromManifest(await loadManifest(manifestPath), { source, state });
     }
     default:
       return (

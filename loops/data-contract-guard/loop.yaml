@@ -1,0 +1,15 @@
+id: data-contract-guard
+
+trigger:
+  type: event
+  events:
+    - pull_request
+
+guardrails:
+  pathAllowlist:
+    - "contracts/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  baselinePath: "contracts/schema.json"

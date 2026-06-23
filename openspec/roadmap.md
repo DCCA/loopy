@@ -47,8 +47,17 @@ see `.github/workflows/dogfood.yml`), **license-sbom-drift** (#5), and
 `Gate` + throttle + reconcile; see [`specs/codemod-campaign.md`](specs/codemod-campaign.md)).
 Also shipped: **prompt-eval-gate** (#4 — LLMOps regression gate; baseline in
 `StateStore`, human-gated promotion; loopy dogfoods it on its own AI loops). Also shipped: **model-upgrade-migration** (#7 — golden-set diff → human-gated
-model switch on `runPlan`). Next from the ranking: **api-deprecation-rollout**,
-then test-impact-budget / perf-budget / a11y-baseline.
+model switch on `runPlan`). Also shipped, a wave of stateful guardrails on the
+durable `StateStore` (+ `Gate` where human approval is warranted):
+**test-impact-budget** ([`specs/test-impact-budget.md`](specs/test-impact-budget.md)
+— EWMA runtime baselines), **data-contract-guard**
+([`specs/data-contract-guard.md`](specs/data-contract-guard.md) — gated breaking
+schema changes), **cost-guardrail**
+([`specs/cost-guardrail.md`](specs/cost-guardrail.md) — gated idle-resource
+remediation, never auto-deletes), and **eval-set-drift**
+([`specs/eval-set-drift.md`](specs/eval-set-drift.md) — eval-coverage drift).
+Next from the ranking: **api-deprecation-rollout** and **dep-major-migration**
+(programmatic `runPlan` loops).
 
 ## Next horizon: product-level loops
 

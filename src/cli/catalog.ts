@@ -143,6 +143,34 @@ export const CATALOG: CatalogEntry[] = [
     output: "pull-request",
     secrets: [GH],
   },
+  {
+    id: "test-impact-budget",
+    description: "Flag tests whose runtime grew past a rolling baseline (stateful)",
+    trigger: { kind: "schedule", cron: "0 7 * * 1" },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "data-contract-guard",
+    description: "Block breaking schema changes vs an approved baseline; human-gated",
+    trigger: { kind: "event", events: ["pull_request"] },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "cost-guardrail",
+    description: "Track idle cloud resources across runs; human-gated remediation",
+    trigger: { kind: "schedule", cron: "0 7 * * *" },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "eval-set-drift",
+    description: "Surface production categories missing from the eval set (stateful)",
+    trigger: { kind: "schedule", cron: "0 7 * * 1" },
+    output: "pull-request",
+    secrets: [GH],
+  },
 ];
 
 export function getEntry(id: string): CatalogEntry | undefined {

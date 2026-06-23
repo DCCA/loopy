@@ -39,6 +39,10 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`release-train`](loops/release-train/README.md) | Rolling Release PR (version + changelog) from conventional commits | deterministic | PR |
 | [`license-sbom-drift`](loops/license-sbom-drift/README.md) | Flag dependency licenses outside the allowlist | deterministic | PR |
 | [`prompt-eval-gate`](loops/prompt-eval-gate/README.md) | Regression-gate prompts vs a baseline (stateful); gated promotion | AI + state | comment / PR |
+| [`test-impact-budget`](loops/test-impact-budget/README.md) | Flag tests whose runtime grew past a rolling EWMA baseline | deterministic + state | PR |
+| [`data-contract-guard`](loops/data-contract-guard/README.md) | Block breaking schema changes vs an approved baseline (human-gated) | deterministic + state + gate | comment / PR |
+| [`cost-guardrail`](loops/cost-guardrail/README.md) | Track idle cloud resources across runs; human-gated remediation | deterministic + state + gate | comment / PR |
+| [`eval-set-drift`](loops/eval-set-drift/README.md) | Surface production categories missing from the eval set (stateful) | deterministic + state | PR |
 
 Plus three **long-horizon** loops on the `longrun` primitives (durable state,
 approval gates, resumable advancement): the

@@ -93,6 +93,22 @@
     "./loops/runbook-freshness": {
       "types": "./dist/loops/runbook-freshness/index.d.ts",
       "default": "./dist/loops/runbook-freshness/index.js"
+    },
+    "./loops/test-impact-budget": {
+      "types": "./dist/loops/test-impact-budget/index.d.ts",
+      "default": "./dist/loops/test-impact-budget/index.js"
+    },
+    "./loops/data-contract-guard": {
+      "types": "./dist/loops/data-contract-guard/index.d.ts",
+      "default": "./dist/loops/data-contract-guard/index.js"
+    },
+    "./loops/cost-guardrail": {
+      "types": "./dist/loops/cost-guardrail/index.d.ts",
+      "default": "./dist/loops/cost-guardrail/index.js"
+    },
+    "./loops/eval-set-drift": {
+      "types": "./dist/loops/eval-set-drift/index.d.ts",
+      "default": "./dist/loops/eval-set-drift/index.js"
     }
   },
   "files": [
