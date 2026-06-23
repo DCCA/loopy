@@ -65,6 +65,10 @@
     "./loops/license-sbom-drift": {
       "types": "./dist/loops/license-sbom-drift/index.d.ts",
       "default": "./dist/loops/license-sbom-drift/index.js"
+    },
+    "./loops/codemod-campaign": {
+      "types": "./dist/loops/codemod-campaign/index.d.ts",
+      "default": "./dist/loops/codemod-campaign/index.js"
     }
   },
   "files": [

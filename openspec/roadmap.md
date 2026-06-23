@@ -42,9 +42,10 @@ API, npm registry, coverage tool, SCA/SAST scanner) is consumer configuration.
 [`research/complex-loops.md`](research/complex-loops.md) ranked new complex loops.
 Shipped from the top of the ranking: **flake-quarantine** (#1 — first loop to use
 the durable `StateStore`), **release-train** (#3 — dogfoods loopy's own releases;
-see `.github/workflows/dogfood.yml`), and **license-sbom-drift** (#5). Next from
-the ranking: **codemod-campaign** (cross-PR campaign on `runPlan`+ledger),
-**prompt-eval-gate**, **model-upgrade-migration**.
+see `.github/workflows/dogfood.yml`), **license-sbom-drift** (#5), and
+**codemod-campaign** (#2 — cross-PR campaign: ledger in `StateStore` + pilot
+`Gate` + throttle + reconcile; see [`specs/codemod-campaign.md`](specs/codemod-campaign.md)).
+Next from the ranking: **prompt-eval-gate**, **model-upgrade-migration**.
 
 ## Next horizon: product-level loops
 
