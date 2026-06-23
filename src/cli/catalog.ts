@@ -73,6 +73,20 @@ export const CATALOG: CatalogEntry[] = [
     output: "pull-request",
     secrets: [GH],
   },
+  {
+    id: "metric-anomaly",
+    description: "Z-score anomaly briefs over your metrics",
+    trigger: { kind: "schedule", cron: "0 7 * * *" },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "incident-followup",
+    description: "Overdue postmortem action items + recurring root causes",
+    trigger: { kind: "schedule", cron: "0 7 * * 1" },
+    output: "pull-request",
+    secrets: [GH],
+  },
 ];
 
 export function getEntry(id: string): CatalogEntry | undefined {

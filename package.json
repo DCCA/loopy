@@ -45,6 +45,14 @@
     "./loops/experiment": {
       "types": "./dist/loops/experiment/index.d.ts",
       "default": "./dist/loops/experiment/index.js"
+    },
+    "./loops/metric-anomaly": {
+      "types": "./dist/loops/metric-anomaly/index.d.ts",
+      "default": "./dist/loops/metric-anomaly/index.js"
+    },
+    "./loops/incident-followup": {
+      "types": "./dist/loops/incident-followup/index.d.ts",
+      "default": "./dist/loops/incident-followup/index.js"
     }
   },
   "files": [

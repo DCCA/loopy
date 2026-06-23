@@ -34,6 +34,17 @@ import {
   type TicketSource,
 } from "../../../loops/kb-gap/index.js";
 import {
+  createMetricAnomalyLoopFromManifest,
+  type MetricSeries,
+  type MetricSource,
+} from "../../../loops/metric-anomaly/index.js";
+import {
+  createIncidentFollowupLoopFromManifest,
+  type ActionItem,
+  type Incident,
+  type IncidentSource,
+} from "../../../loops/incident-followup/index.js";
+import {
   createDocWriter,
   createReviewer,
   createArticleWriter,
@@ -63,6 +74,8 @@ export interface RunOptions {
   diffProvider?: DiffProvider;
   ticketSource?: TicketSource;
   coveredTopics?: () => Promise<string[]>;
+  metricSource?: MetricSource;
+  incidentSource?: IncidentSource;
   /** environment used for config resolution (defaults to process.env) */
   env?: Env;
 }
@@ -180,6 +193,28 @@ async function buildLoop(
         articleWriter: createArticleWriter(client, kbDir),
       });
     }
+    case "metric-anomaly": {
+      const metrics = options.metricSource ?? metricSourceFromEnv(env);
+      if (!metrics) {
+        return (
+          "`metric-anomaly` needs metrics. Set LOOPY_METRICS_FILE to a JSON file containing an " +
+          "array of { name, points: [{ t, value }] }."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      return createMetricAnomalyLoopFromManifest(manifest, { metrics });
+    }
+    case "incident-followup": {
+      const incidents = options.incidentSource ?? incidentSourceFromEnv(env);
+      if (!incidents) {
+        return (
+          "`incident-followup` needs incident data. Set LOOPY_INCIDENTS_FILE to a JSON file " +
+          "containing { incidents: [...], actionItems: [...] }."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      return createIncidentFollowupLoopFromManifest(manifest, { incidents });
+    }
     default:
       return (
         `\`${entry.id}\` is not runnable via the CLI yet (needs additional boundaries — ` +
@@ -235,6 +270,32 @@ function ticketSourceFromEnv(env: Env): TicketSource | null {
     listResolved: async (): Promise<Ticket[]> => {
       const parsed = JSON.parse(await readFile(file, "utf8")) as unknown;
       return Array.isArray(parsed) ? (parsed as Ticket[]) : [];
+    },
+  };
+}
+
+function metricSourceFromEnv(env: Env): MetricSource | null {
+  const file = env["LOOPY_METRICS_FILE"];
+  if (!file) return null;
+  return {
+    series: async (): Promise<MetricSeries[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as unknown;
+      return Array.isArray(parsed) ? (parsed as MetricSeries[]) : [];
+    },
+  };
+}
+
+function incidentSourceFromEnv(env: Env): IncidentSource | null {
+  const file = env["LOOPY_INCIDENTS_FILE"];
+  if (!file) return null;
+  return {
+    incidents: async (): Promise<Incident[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as { incidents?: Incident[] };
+      return Array.isArray(parsed.incidents) ? parsed.incidents : [];
+    },
+    actionItems: async (): Promise<ActionItem[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as { actionItems?: ActionItem[] };
+      return Array.isArray(parsed.actionItems) ? parsed.actionItems : [];
     },
   };
 }

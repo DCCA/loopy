@@ -51,10 +51,14 @@ gates, resumable plans) in `src/core/longrun/`; the **KB-Gap Self-Heal** loop
 (first product-level wedge, turnkey); and the **Experiment Lifecycle
 Orchestrator** ([`specs/experiment-orchestrator.md`](specs/experiment-orchestrator.md))
 — the flagship long-horizon loop on `runPlan` + gates + state (design → approve →
-launch → bake → readout → decide). Remaining candidates on the same primitives:
-Metric Anomaly → Root-Cause Narrator, Incident Action-Item/Recurrence, Churn →
-Intervention. Cross-cutting follow-ups: non-PR output adapters (issue tracker,
-experimentation platform, dashboards) and a `loopy advance <plan>` CLI verb.
+launch → bake → readout → decide). The **Metric Anomaly** and **Incident Follow-up** loops are now shipped
+(deterministic, turnkey). Remaining candidates on the same primitives: Churn →
+Intervention, Voice-of-Customer miner. Cross-cutting follow-ups: non-PR output
+adapters (issue tracker, experimentation platform, dashboards) and a
+`loopy advance <plan>` CLI verb for long-horizon loops.
+
+A **project landing page** ships under `site/` (deployed to GitHub Pages via
+`.github/workflows/pages.yml`).
 
 ## Backlog (catalogued, not yet proposed)
 

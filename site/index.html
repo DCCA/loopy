@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>loopy — reusable automation loops for your repo</title>
+<meta name="description" content="loopy is a library of reusable, guardrailed automation loops you import into your repo with one command. Every loop follows one contract — trigger, detect, act, output, guardrails — and ships a reviewable PR. Provider-agnostic, fail-safe, open." />
+<meta name="theme-color" content="#07080d" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="loopy — reusable automation loops for your repo" />
+<meta property="og:description" content="One guardrailed, importable framework spanning many automation loops. Import one in a single command: npx loopy add auto-docs. Every loop ships a reviewable PR." />
+<meta property="og:url" content="https://dcca.github.io/loopy/" />
+<meta property="og:site_name" content="loopy" />
+<meta property="og:image" content="https://dcca.github.io/loopy/loopy.svg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="loopy — reusable automation loops for your repo" />
+<meta name="twitter:description" content="One guardrailed, importable framework spanning many automation loops. npx loopy add <loop>." />
+
+<link rel="icon" href="loopy.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top" aria-label="loopy home">
+      <img src="loopy.svg" alt="" width="38" height="19" />
+      <span>loopy</span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#contract">Contract</a>
+      <a href="#loops">Loops</a>
+      <a href="#install">Install</a>
+      <a href="#compare">Compare</a>
+      <a href="#longhorizon">Long-horizon</a>
+      <a class="nav-cta" href="https://github.com/DCCA/loopy" target="_blank" rel="noopener">GitHub ↗</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="wrap">
+    <span class="pill"><span class="dot" aria-hidden="true"></span> <b>8 loops</b> shipped · PR-first · provider-agnostic</span>
+    <h1>Reusable <span class="grad">automation loops</span> for your repo.</h1>
+    <p class="lead">
+      loopy is a library of guardrailed loops software teams import into their repositories.
+      One contract, a fail-safe runner, and a reviewable pull request out the other end —
+      import one in a single command.
+    </p>
+
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://github.com/DCCA/loopy" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Star on GitHub
+      </a>
+      <div class="cmd">
+        <span class="prompt">$</span>
+        <code id="hero-cmd">npx loopy add auto-docs</code>
+        <button class="copy" data-copy="npx loopy add auto-docs" aria-label="Copy command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat"><div class="n">8</div><div class="l">Production loops</div></div>
+      <div class="stat"><div class="n">1</div><div class="l">Portable contract</div></div>
+      <div class="stat"><div class="n">PR</div><div class="l">Reviewable output, always</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">Partial / on-error writes</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRACT -->
+<section id="contract">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The loop contract</span>
+      <h2 class="section-title">One contract, every loop.</h2>
+      <p class="section-sub">
+        However smart its internals, every loop follows the same five-stage shape and runs through
+        a single loop-agnostic runner. That uniformity is what makes loops importable, reviewable, and safe.
+      </p>
+    </div>
+
+    <div class="pipeline" role="list" aria-label="Loop contract stages">
+      <div class="stage" role="listitem">
+        <span class="num">01</span>
+        <span class="name">trigger</span>
+        <span class="desc">A cron schedule, a repo event, or a manual run kicks the loop off.</span>
+      </div>
+      <div class="stage" role="listitem">
+        <span class="num">02</span>
+        <span class="name">detect</span>
+        <span class="desc">Cheap, deterministic check for whether there is actually work to do.</span>
+      </div>
+      <div class="stage" role="listitem">
+        <span class="num">03</span>
+        <span class="name">act</span>
+        <span class="desc">Do the work — an AI step, deterministic code, or a hybrid of both.</span>
+      </div>
+      <div class="stage" role="listitem">
+        <span class="num">04</span>
+        <span class="name">output</span>
+        <span class="desc">A reviewable pull request — safe and reversible — or an advisory comment.</span>
+      </div>
+      <div class="stage is-guard" role="listitem">
+        <span class="num">05</span>
+        <span class="name">guardrails</span>
+        <span class="desc">Path allowlist, max-files cap, idempotency, and human approval gates.</span>
+      </div>
+    </div>
+
+    <div class="failsafe">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+      <span><b>Fail-safe by design.</b> On any error — including a guardrail violation — the runner produces no output and never partially applies changes.</span>
+    </div>
+  </div>
+</section>
+
+<!-- LOOPS GRID -->
+<section id="loops">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The catalog</span>
+      <h2 class="section-title">Loops that keep your repo healthy.</h2>
+      <p class="section-sub">
+        Each loop does one job and ships its own reviewable output. Add any of them with
+        <code style="font-family:var(--mono)">npx loopy add &lt;loop&gt;</code>.
+      </p>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <div class="top"><span class="lname">auto-docs</span><span class="tag tag-ai">AI</span></div>
+        <p>Updates documentation when the code surface drifts away from what the docs describe.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">dep-updates</span><span class="tag tag-det">Deterministic</span></div>
+        <p>One grouped pull request bumping your non-major dependency updates together.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">changelog</span><span class="tag tag-det">Deterministic</span></div>
+        <p>Drafts a changelog entry from unreleased commits using conventional-commit history.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">pr-review</span><span class="tag tag-ai">AI</span></div>
+        <p>Posts an advisory automated review comment on a pull request — never blocking.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">test-coverage</span><span class="tag tag-ai">AI</span></div>
+        <p>Backfills tests for uncovered changed lines, self-validating before it opens a PR.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">security-remediation</span><span class="tag tag-hy">Hybrid</span></div>
+        <p>Human-gated fixes for security findings above a configured severity threshold.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">kb-gap</span><span class="tag tag-ai">AI</span></div>
+        <p>Self-heals docs by drafting KB articles for recurring support-ticket topics.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">metric-anomaly</span><span class="tag tag-det">Deterministic</span></div>
+        <p>Z-score anomaly detection that ships a concise brief when a metric goes sideways.</p>
+      </article>
+      <article class="card">
+        <div class="top"><span class="lname">incident-followup</span><span class="tag tag-lh">Long-horizon</span></div>
+        <p>Tracks overdue action items and flags recurrence across past incidents.</p>
+      </article>
+    </div>
+
+    <div class="legend" aria-hidden="true">
+      <span><i style="background:#7dd3fc"></i> Deterministic — code-only, repeatable</span>
+      <span><i style="background:#c4b5fd"></i> AI — defaults to OpenRouter <code style="font-family:var(--mono)">z-ai/glm-5.2</code>, configurable</span>
+      <span><i style="background:#6ee7b7"></i> Hybrid — AI + deterministic checks</span>
+      <span><i style="background:#fcd34d"></i> Long-horizon — durable, multi-run state</span>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">1-click install</span>
+      <h2 class="section-title">Import a loop in a single command.</h2>
+      <p class="section-sub">
+        loopy vendors the loop into your repo — workflow, config, and playbook — so it lives in your
+        version control and runs on your CI. No platform to adopt, no lock-in.
+      </p>
+    </div>
+
+    <div class="install-grid">
+      <div class="terminal" aria-label="Example terminal session">
+        <div class="bar"><i></i><i></i><i></i><span class="ttl">bash — your-repo</span></div>
+        <div class="body">
+<div class="line"><span class="p">$ </span><span class="c">npx loopy add dep-updates</span></div>
+<div class="out">  <span class="ok">✓</span> added <span class="hl">dep-updates</span> → .github/workflows/loopy-dep-updates.yml</div>
+<div class="out">  <span class="ok">✓</span> wrote loopy/dep-updates/loop.yaml</div>
+<div class="out">  <span class="ok">✓</span> guardrails: allowlist · max-files · skip-if-open-PR</div>
+<div class="line">&nbsp;</div>
+<div class="line"><span class="p">$ </span><span class="c">npx loopy list</span></div>
+<div class="out">  auto-docs  dep-updates  changelog  pr-review</div>
+<div class="out">  test-coverage  security-remediation  kb-gap  …</div>
+<div class="line">&nbsp;</div>
+<div class="line"><span class="p">$ </span><span class="c">npx loopy run dep-updates</span></div>
+<div class="out">  detect → 6 updates · act → grouped bump</div>
+<div class="out">  output → <span class="hl">PR #142 opened</span> for review  <span class="ok">✓</span></div>
+        </div>
+      </div>
+
+      <div class="install-copy">
+        <ul class="install-list">
+          <li>
+            <span class="ic">+</span>
+            <div>
+              <div class="t">Add a loop</div>
+              <div class="d"><code>npx loopy add dep-updates</code> — vendors the loop and its guardrails into your repo.</div>
+            </div>
+          </li>
+          <li>
+            <span class="ic">≡</span>
+            <div>
+              <div class="t">List the catalog</div>
+              <div class="d"><code>npx loopy list</code> — see every loop available to import.</div>
+            </div>
+          </li>
+          <li>
+            <span class="ic">▷</span>
+            <div>
+              <div class="t">Run it</div>
+              <div class="d"><code>npx loopy run &lt;loop&gt;</code> — trigger a loop locally or wire it to CI / cron.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section id="compare">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Compared to best-in-class</span>
+      <h2 class="section-title">One framework, many loops.</h2>
+      <p class="section-sub">
+        Specialist tools are excellent in their niche. loopy's angle is different: a single
+        guardrailed, importable framework that spans many loops with one contract and one CLI.
+      </p>
+    </div>
+
+    <div class="table-scroll">
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th scope="col"></th>
+            <th scope="col">Dependabot / Renovate</th>
+            <th scope="col">CodeRabbit</th>
+            <th scope="col">Vanta / Drata</th>
+            <th scope="col">Statsig / Eppo</th>
+            <th scope="col" class="loopy-col">loopy</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Scope</th>
+            <td>Dependency updates</td>
+            <td>PR review</td>
+            <td>Compliance</td>
+            <td>Experiments</td>
+            <td class="loopy-col">Many loops in one framework</td>
+          </tr>
+          <tr>
+            <th scope="row">Install</th>
+            <td>Per-tool setup</td>
+            <td>Per-tool setup</td>
+            <td>Per-tool setup</td>
+            <td>Per-tool setup</td>
+            <td class="loopy-col">One CLI — <code>npx loopy add</code></td>
+          </tr>
+          <tr>
+            <th scope="row">Output</th>
+            <td>PRs</td>
+            <td>PR comments</td>
+            <td>Dashboards / reports</td>
+            <td>Dashboards / readouts</td>
+            <td class="loopy-col">Reviewable PR or comment, uniformly</td>
+          </tr>
+          <tr>
+            <th scope="row">Guardrails</th>
+            <td>Update rules</td>
+            <td>Review config</td>
+            <td>Policy controls</td>
+            <td>Experiment gates</td>
+            <td class="loopy-col">First-class: allowlist · caps · idempotency · human gates</td>
+          </tr>
+          <tr>
+            <th scope="row">Extensibility</th>
+            <td>Closed product</td>
+            <td>Closed product</td>
+            <td>Closed product</td>
+            <td>Closed product</td>
+            <td class="loopy-col"><span class="check">✓</span> Importable, open loops</td>
+          </tr>
+          <tr>
+            <th scope="row">AI provider</th>
+            <td>n/a</td>
+            <td>Vendor-managed</td>
+            <td>Vendor-managed</td>
+            <td>n/a</td>
+            <td class="loopy-col">Provider-agnostic (defaults to OpenRouter, configurable)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="cmp-caption">
+      <b>Honest take:</b> the specialists go deeper in their niche — Renovate's update graph, CodeRabbit's
+      review depth, Vanta's audit coverage, and Statsig's stats engine each outclass a single loopy loop on
+      their home turf. loopy isn't trying to beat them at X; it gives you one guardrailed, importable
+      framework spanning many loops, so you adopt the contract once instead of stitching together point tools.
+    </p>
+  </div>
+</section>
+
+<!-- LONG-HORIZON -->
+<section id="longhorizon" class="lh-wrap">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Long-horizon primitives</span>
+      <h2 class="section-title">Loops that remember, wait, and resume.</h2>
+      <p class="section-sub">
+        Beyond single-shot loops, loopy ships the substrate for stateful, multi-step work that
+        unfolds over days — the same contract, extended across time.
+      </p>
+    </div>
+
+    <div class="lh-grid">
+      <div class="lh-prims">
+        <div class="lh-prim">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></span>
+          <div><h4>Durable state</h4><p>A persistent store gives loops memory across runs — they pick up where they left off.</p></div>
+        </div>
+        <div class="lh-prim">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 5c0 1.66 4 3 9 3s9-1.34 9-3-4-3-9-3-9 1.34-9 3"/></svg></span>
+          <div><h4>Human-approval gates</h4><p>First-class checkpoints that block a plan until a person signs off — built into the contract.</p></div>
+        </div>
+        <div class="lh-prim">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>
+          <div><h4>Resumable plans</h4><p>Multi-step plans with wait-states and gate-blocking that survive restarts and resume cleanly.</p></div>
+        </div>
+      </div>
+
+      <div class="orchestrator">
+        <div class="badge">Powered by the primitives</div>
+        <h3>Experiment Lifecycle Orchestrator</h3>
+        <div class="flow">
+          <div class="step"><span class="marker">1</span><span class="label">Design</span></div>
+          <div class="step"><span class="marker">2</span><span class="label">Approve</span><span class="gate">human gate</span></div>
+          <div class="step"><span class="marker">3</span><span class="label">Launch</span></div>
+          <div class="step"><span class="marker">4</span><span class="label">Bake</span><span class="gate">wait-state</span></div>
+          <div class="step"><span class="marker">5</span><span class="label">Readout</span></div>
+          <div class="step"><span class="marker">6</span><span class="label">Decide</span><span class="gate">human gate</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="wrap">
+    <h2>Adopt the contract once.</h2>
+    <p>Import your first loop, review the PR it opens, and let it run on your CI. That's the whole onboarding.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://github.com/DCCA/loopy" target="_blank" rel="noopener">Get started on GitHub</a>
+      <div class="cmd">
+        <span class="prompt">$</span>
+        <code>npx loopy add auto-docs</code>
+        <button class="copy" data-copy="npx loopy add auto-docs" aria-label="Copy command">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="brand">
+          <img src="loopy.svg" alt="" width="38" height="19" />
+          <span>loopy</span>
+        </div>
+        <p class="blurb">A library of reusable, guardrailed automation loops you import into your repo with one command.</p>
+      </div>
+      <div class="foot-links">
+        <div class="foot-col">
+          <h5>Project</h5>
+          <a href="https://github.com/DCCA/loopy" target="_blank" rel="noopener">GitHub repo ↗</a>
+          <a href="https://github.com/DCCA/loopy/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+          <a href="https://github.com/DCCA/loopy#readme" target="_blank" rel="noopener">Documentation</a>
+        </div>
+        <div class="foot-col">
+          <h5>Explore</h5>
+          <a href="#contract">The contract</a>
+          <a href="#loops">Loops</a>
+          <a href="#compare">Comparison</a>
+          <a href="#longhorizon">Long-horizon</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 loopy · MIT License</span>
+      <span class="built">Built with the OpenSpec workflow.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Optional, tiny, inline: copy-to-clipboard for command pills.
+  document.querySelectorAll('.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy') || '';
+      navigator.clipboard && navigator.clipboard.writeText(text).then(function () {
+        btn.classList.add('copied');
+        setTimeout(function () { btn.classList.remove('copied'); }, 1400);
+      });
+    });
+  });
+</script>
+</body>
+</html>
