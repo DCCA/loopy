@@ -87,6 +87,27 @@ export const CATALOG: CatalogEntry[] = [
     output: "pull-request",
     secrets: [GH],
   },
+  {
+    id: "flake-quarantine",
+    description: "Score flaky tests across runs and quarantine the worst",
+    trigger: { kind: "schedule", cron: "0 7 * * *" },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "release-train",
+    description: "Rolling Release PR from conventional commits",
+    trigger: { kind: "event", events: ["push"] },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "license-sbom-drift",
+    description: "Flag dependency licenses outside the allowlist",
+    trigger: { kind: "schedule", cron: "0 7 * * 1" },
+    output: "pull-request",
+    secrets: [GH],
+  },
 ];
 
 export function getEntry(id: string): CatalogEntry | undefined {

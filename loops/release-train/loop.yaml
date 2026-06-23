@@ -1,0 +1,17 @@
+id: release-train
+
+trigger:
+  type: event
+  events:
+    - "push"
+
+guardrails:
+  pathAllowlist:
+    - "package.json"
+    - "CHANGELOG.md"
+  maxFiles: 2
+  skipIfOpenPr: true
+
+config:
+  manifestPath: "package.json"
+  changelogPath: "CHANGELOG.md"

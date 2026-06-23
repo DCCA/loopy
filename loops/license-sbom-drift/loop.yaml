@@ -1,0 +1,23 @@
+id: license-sbom-drift
+
+trigger:
+  type: schedule
+  cron: "0 7 * * 1" # weekly, Mondays 07:00 UTC
+
+guardrails:
+  pathAllowlist:
+    - "reports/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  reportPath: "reports/licenses.md"
+  allowlist:
+    - "MIT"
+    - "ISC"
+    - "Apache-2.0"
+    - "BSD-2-Clause"
+    - "BSD-3-Clause"
+    - "0BSD"
+    - "CC0-1.0"
+    - "Unlicense"

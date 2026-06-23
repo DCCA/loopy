@@ -1,0 +1,33 @@
+name: dogfood
+
+# loopy dogfooding its own loops on this repo, via the locally-built CLI
+# (npx isn't used because loopy isn't published to npm yet).
+#
+# Manual by default to avoid surprise PRs. To let loopy manage its own rolling
+# Release PR automatically, uncomment the `push` trigger.
+on:
+  workflow_dispatch: {}
+  # push:
+  #   branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # release-train reads git history/tags
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm ci
+      - run: npm run build
+      - name: Run loopy's own release-train loop
+        run: node dist/src/cli/index.js run release-train
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}

@@ -35,6 +35,9 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`kb-gap`](loops/kb-gap/README.md) | Drafts KB articles for recurring support topics (self-heal docs) | AI | PR |
 | [`metric-anomaly`](loops/metric-anomaly/README.md) | Z-score anomaly briefs over your metrics | deterministic | PR |
 | [`incident-followup`](loops/incident-followup/README.md) | Overdue postmortem action items + recurring root causes | deterministic | PR |
+| [`flake-quarantine`](loops/flake-quarantine/README.md) | Score flaky tests across runs (stateful) and quarantine the worst | deterministic + state | PR |
+| [`release-train`](loops/release-train/README.md) | Rolling Release PR (version + changelog) from conventional commits | deterministic | PR |
+| [`license-sbom-drift`](loops/license-sbom-drift/README.md) | Flag dependency licenses outside the allowlist | deterministic | PR |
 
 Plus a **long-horizon** loop — the
 [Experiment Lifecycle Orchestrator](loops/experiment/README.md) — built on the

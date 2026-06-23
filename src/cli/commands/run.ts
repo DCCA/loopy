@@ -45,6 +45,21 @@ import {
   type IncidentSource,
 } from "../../../loops/incident-followup/index.js";
 import {
+  createFlakeQuarantineLoopFromManifest,
+  type TestRun,
+  type TestResultSource,
+} from "../../../loops/flake-quarantine/index.js";
+import {
+  createReleaseTrainLoopFromManifest,
+  type ReleaseSource,
+} from "../../../loops/release-train/index.js";
+import {
+  createLicenseSbomLoopFromManifest,
+  type SbomEntry,
+  type SbomSource,
+} from "../../../loops/license-sbom-drift/index.js";
+import { createFileStateStore, type StateStore } from "../../core/index.js";
+import {
   createDocWriter,
   createReviewer,
   createArticleWriter,
@@ -76,6 +91,11 @@ export interface RunOptions {
   coveredTopics?: () => Promise<string[]>;
   metricSource?: MetricSource;
   incidentSource?: IncidentSource;
+  testResults?: TestResultSource;
+  stateStore?: StateStore;
+  readQuarantine?: () => Promise<string[]>;
+  releaseSource?: ReleaseSource;
+  sbomSource?: SbomSource;
   /** environment used for config resolution (defaults to process.env) */
   env?: Env;
 }
@@ -215,6 +235,39 @@ async function buildLoop(
       const manifest = await loadManifest(manifestPath);
       return createIncidentFollowupLoopFromManifest(manifest, { incidents });
     }
+    case "flake-quarantine": {
+      const results = options.testResults ?? testResultsFromEnv(env);
+      if (!results) {
+        return (
+          "`flake-quarantine` needs test results. Set LOOPY_TEST_RESULTS_FILE to a JSON file " +
+          "containing an array of { id, testId, status, commit? }."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      const quarantinePath =
+        typeof manifest.config["quarantinePath"] === "string"
+          ? manifest.config["quarantinePath"]
+          : "quarantine.json";
+      const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
+      const readQuarantine = options.readQuarantine ?? (() => readQuarantineFile(cwd, quarantinePath));
+      return createFlakeQuarantineLoopFromManifest(manifest, { results, state, readQuarantine });
+    }
+    case "release-train": {
+      const source = options.releaseSource ?? releaseSourceFromGit(cwd);
+      const manifest = await loadManifest(manifestPath);
+      return createReleaseTrainLoopFromManifest(manifest, { source });
+    }
+    case "license-sbom-drift": {
+      const sbom = options.sbomSource ?? sbomFromEnv(env);
+      if (!sbom) {
+        return (
+          "`license-sbom-drift` needs an SBOM. Set LOOPY_SBOM_FILE to a JSON file containing an " +
+          "array of { name, version, license }."
+        );
+      }
+      const manifest = await loadManifest(manifestPath);
+      return createLicenseSbomLoopFromManifest(manifest, { sbom });
+    }
     default:
       return (
         `\`${entry.id}\` is not runnable via the CLI yet (needs additional boundaries — ` +
@@ -296,6 +349,54 @@ function incidentSourceFromEnv(env: Env): IncidentSource | null {
     actionItems: async (): Promise<ActionItem[]> => {
       const parsed = JSON.parse(await readFile(file, "utf8")) as { actionItems?: ActionItem[] };
       return Array.isArray(parsed.actionItems) ? parsed.actionItems : [];
+    },
+  };
+}
+
+function testResultsFromEnv(env: Env): TestResultSource | null {
+  const file = env["LOOPY_TEST_RESULTS_FILE"];
+  if (!file) return null;
+  return {
+    recent: async (): Promise<TestRun[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as unknown;
+      return Array.isArray(parsed) ? (parsed as TestRun[]) : [];
+    },
+  };
+}
+
+async function readQuarantineFile(cwd: string, path: string): Promise<string[]> {
+  try {
+    const parsed = JSON.parse(await readFile(join(cwd, path), "utf8")) as unknown;
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function releaseSourceFromGit(cwd: string): ReleaseSource {
+  const provider = createGitCommitProvider(cwd);
+  return {
+    unreleased: () => provider.listUnreleased(),
+    currentVersion: async (): Promise<string> => {
+      try {
+        const pkg = JSON.parse(await readFile(join(cwd, "package.json"), "utf8")) as {
+          version?: string;
+        };
+        return typeof pkg.version === "string" ? pkg.version : "0.0.0";
+      } catch {
+        return "0.0.0";
+      }
+    },
+  };
+}
+
+function sbomFromEnv(env: Env): SbomSource | null {
+  const file = env["LOOPY_SBOM_FILE"];
+  if (!file) return null;
+  return {
+    current: async (): Promise<SbomEntry[]> => {
+      const parsed = JSON.parse(await readFile(file, "utf8")) as unknown;
+      return Array.isArray(parsed) ? (parsed as SbomEntry[]) : [];
     },
   };
 }
