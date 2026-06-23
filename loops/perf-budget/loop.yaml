@@ -1,0 +1,17 @@
+id: perf-budget
+
+trigger:
+  type: event
+  events:
+    - pull_request
+
+guardrails:
+  pathAllowlist:
+    - "reports/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  reportPath: "reports/perf.md"
+  # fractional margin a measured value may exceed its baseline before it counts as a regression.
+  tolerance: 0.1

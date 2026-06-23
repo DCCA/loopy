@@ -1,0 +1,28 @@
+id: api-deprecation-rollout
+
+# When the loop runs. Weekly is a sensible cadence for advancing a long-horizon
+# deprecation: announce, then re-check the grace deadline and caller telemetry.
+# This loop is driven programmatically (advanceApiDeprecation); the schedule and
+# guardrails below document intent for a future CLI/adapter.
+trigger:
+  type: schedule
+  cron: "0 7 * * 1" # Mondays at 07:00 UTC
+
+# Safety rails enforced by the runner over any change set this loop produces.
+guardrails:
+  pathAllowlist:
+    - "docs/**"
+    - "src/**"
+  maxFiles: 20
+  skipIfOpenPr: true
+
+# Loop-specific configuration consumed by the api-deprecation-rollout loop.
+config:
+  # The fully-qualified API symbol being deprecated (e.g. "v1.users.list").
+  api: "example.api.v1"
+  # Where the deprecation notice markdown is written on announce.
+  noticePath: "docs/deprecations/example.md"
+  # Where the removal note markdown is written once removal is approved.
+  removalPath: "docs/deprecations/example-removed.md"
+  # ISO timestamp the grace period ends; the long-horizon WAIT resolves at/after.
+  graceUntilIso: "2026-12-01T00:00:00.000Z"

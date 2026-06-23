@@ -73,6 +73,50 @@
     "./loops/prompt-eval-gate": {
       "types": "./dist/loops/prompt-eval-gate/index.d.ts",
       "default": "./dist/loops/prompt-eval-gate/index.js"
+    },
+    "./loops/model-upgrade-migration": {
+      "types": "./dist/loops/model-upgrade-migration/index.d.ts",
+      "default": "./dist/loops/model-upgrade-migration/index.js"
+    },
+    "./loops/i18n-drift": {
+      "types": "./dist/loops/i18n-drift/index.d.ts",
+      "default": "./dist/loops/i18n-drift/index.js"
+    },
+    "./loops/perf-budget": {
+      "types": "./dist/loops/perf-budget/index.d.ts",
+      "default": "./dist/loops/perf-budget/index.js"
+    },
+    "./loops/a11y-baseline": {
+      "types": "./dist/loops/a11y-baseline/index.d.ts",
+      "default": "./dist/loops/a11y-baseline/index.js"
+    },
+    "./loops/runbook-freshness": {
+      "types": "./dist/loops/runbook-freshness/index.d.ts",
+      "default": "./dist/loops/runbook-freshness/index.js"
+    },
+    "./loops/test-impact-budget": {
+      "types": "./dist/loops/test-impact-budget/index.d.ts",
+      "default": "./dist/loops/test-impact-budget/index.js"
+    },
+    "./loops/data-contract-guard": {
+      "types": "./dist/loops/data-contract-guard/index.d.ts",
+      "default": "./dist/loops/data-contract-guard/index.js"
+    },
+    "./loops/cost-guardrail": {
+      "types": "./dist/loops/cost-guardrail/index.d.ts",
+      "default": "./dist/loops/cost-guardrail/index.js"
+    },
+    "./loops/eval-set-drift": {
+      "types": "./dist/loops/eval-set-drift/index.d.ts",
+      "default": "./dist/loops/eval-set-drift/index.js"
+    },
+    "./loops/api-deprecation-rollout": {
+      "types": "./dist/loops/api-deprecation-rollout/index.d.ts",
+      "default": "./dist/loops/api-deprecation-rollout/index.js"
+    },
+    "./loops/dep-major-migration": {
+      "types": "./dist/loops/dep-major-migration/index.d.ts",
+      "default": "./dist/loops/dep-major-migration/index.js"
     }
   },
   "files": [

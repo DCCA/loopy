@@ -1,0 +1,15 @@
+id: i18n-drift
+
+trigger:
+  type: event
+  events:
+    - pull_request
+
+guardrails:
+  pathAllowlist:
+    - "reports/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  reportPath: "reports/i18n-status.md"

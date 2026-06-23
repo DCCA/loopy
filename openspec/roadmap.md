@@ -46,8 +46,23 @@ see `.github/workflows/dogfood.yml`), **license-sbom-drift** (#5), and
 **codemod-campaign** (#2 — cross-PR campaign: ledger in `StateStore` + pilot
 `Gate` + throttle + reconcile; see [`specs/codemod-campaign.md`](specs/codemod-campaign.md)).
 Also shipped: **prompt-eval-gate** (#4 — LLMOps regression gate; baseline in
-`StateStore`, human-gated promotion; loopy dogfoods it on its own AI loops). Next
-from the ranking: **model-upgrade-migration**, then api-deprecation-rollout.
+`StateStore`, human-gated promotion; loopy dogfoods it on its own AI loops). Also shipped: **model-upgrade-migration** (#7 — golden-set diff → human-gated
+model switch on `runPlan`). Also shipped, a wave of stateful guardrails on the
+durable `StateStore` (+ `Gate` where human approval is warranted):
+**test-impact-budget** ([`specs/test-impact-budget.md`](specs/test-impact-budget.md)
+— EWMA runtime baselines), **data-contract-guard**
+([`specs/data-contract-guard.md`](specs/data-contract-guard.md) — gated breaking
+schema changes), **cost-guardrail**
+([`specs/cost-guardrail.md`](specs/cost-guardrail.md) — gated idle-resource
+remediation, never auto-deletes), and **eval-set-drift**
+([`specs/eval-set-drift.md`](specs/eval-set-drift.md) — eval-coverage drift).
+Also shipped, two long-horizon programmatic `runPlan` loops (export-only `advance*`
+APIs, resumable via `StateStore` + `Gate`): **api-deprecation-rollout**
+([`specs/api-deprecation-rollout.md`](specs/api-deprecation-rollout.md) — announce
+→ grace-period wait → caller-drain → human-gated removal) and **dep-major-migration**
+([`specs/dep-major-migration.md`](specs/dep-major-migration.md) — verify build →
+human-gated approval → emit the single major bump). With these, the complex-loops
+ranking and the stateful/long-horizon backlog are fully implemented.
 
 ## Next horizon: product-level loops
 

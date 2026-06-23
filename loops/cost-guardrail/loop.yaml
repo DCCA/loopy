@@ -1,0 +1,16 @@
+id: cost-guardrail
+
+trigger:
+  type: schedule
+  cron: "0 7 * * *"
+
+guardrails:
+  pathAllowlist:
+    - "reports/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  reportPath: "reports/cost-guardrail.md"
+  idleThreshold: 0.05
+  minStreak: 3
