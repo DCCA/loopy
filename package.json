@@ -109,6 +109,14 @@
     "./loops/eval-set-drift": {
       "types": "./dist/loops/eval-set-drift/index.d.ts",
       "default": "./dist/loops/eval-set-drift/index.js"
+    },
+    "./loops/api-deprecation-rollout": {
+      "types": "./dist/loops/api-deprecation-rollout/index.d.ts",
+      "default": "./dist/loops/api-deprecation-rollout/index.js"
+    },
+    "./loops/dep-major-migration": {
+      "types": "./dist/loops/dep-major-migration/index.d.ts",
+      "default": "./dist/loops/dep-major-migration/index.js"
     }
   },
   "files": [

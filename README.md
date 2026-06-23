@@ -48,9 +48,13 @@ Plus three **long-horizon** loops on the `longrun` primitives (durable state,
 approval gates, resumable advancement): the
 [Experiment Lifecycle Orchestrator](loops/experiment/README.md), the
 [Codemod Campaign](loops/codemod-campaign/README.md) (throttled cross-PR
-migration with a ledger + pilot gate), and the
+migration with a ledger + pilot gate), the
 [Model-Upgrade Migration](loops/model-upgrade-migration/README.md) (golden-set
-diff → human-gated model switch).
+diff → human-gated model switch), the
+[API Deprecation Rollout](loops/api-deprecation-rollout/README.md) (announce →
+grace-period wait → caller-drain → human-gated removal), and the
+[Dependency Major Migration](loops/dep-major-migration/README.md) (verify build →
+human-gated approval → emit the major bump).
 
 🌐 **[Project site](https://dcca.github.io/loopy/)** · See the
 [roadmap](openspec/roadmap.md) for the backlog and the

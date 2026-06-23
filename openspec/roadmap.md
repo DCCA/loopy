@@ -56,8 +56,13 @@ schema changes), **cost-guardrail**
 ([`specs/cost-guardrail.md`](specs/cost-guardrail.md) — gated idle-resource
 remediation, never auto-deletes), and **eval-set-drift**
 ([`specs/eval-set-drift.md`](specs/eval-set-drift.md) — eval-coverage drift).
-Next from the ranking: **api-deprecation-rollout** and **dep-major-migration**
-(programmatic `runPlan` loops).
+Also shipped, two long-horizon programmatic `runPlan` loops (export-only `advance*`
+APIs, resumable via `StateStore` + `Gate`): **api-deprecation-rollout**
+([`specs/api-deprecation-rollout.md`](specs/api-deprecation-rollout.md) — announce
+→ grace-period wait → caller-drain → human-gated removal) and **dep-major-migration**
+([`specs/dep-major-migration.md`](specs/dep-major-migration.md) — verify build →
+human-gated approval → emit the single major bump). With these, the complex-loops
+ranking and the stateful/long-horizon backlog are fully implemented.
 
 ## Next horizon: product-level loops
 
