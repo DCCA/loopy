@@ -1,0 +1,16 @@
+id: prompt-eval-gate
+
+trigger:
+  type: event
+  events:
+    - pull_request
+
+guardrails:
+  pathAllowlist:
+    - "evals/**"
+  maxFiles: 5
+  skipIfOpenPr: true
+
+config:
+  baselinePath: "evals/baseline.json"
+  tolerance: 0

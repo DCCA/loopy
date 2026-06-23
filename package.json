@@ -69,6 +69,10 @@
     "./loops/codemod-campaign": {
       "types": "./dist/loops/codemod-campaign/index.d.ts",
       "default": "./dist/loops/codemod-campaign/index.js"
+    },
+    "./loops/prompt-eval-gate": {
+      "types": "./dist/loops/prompt-eval-gate/index.d.ts",
+      "default": "./dist/loops/prompt-eval-gate/index.js"
     }
   },
   "files": [

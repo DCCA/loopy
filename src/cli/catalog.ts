@@ -108,6 +108,13 @@ export const CATALOG: CatalogEntry[] = [
     output: "pull-request",
     secrets: [GH],
   },
+  {
+    id: "prompt-eval-gate",
+    description: "Regression-gate prompts against a baseline; gated promotion",
+    trigger: { kind: "event", events: ["pull_request"] },
+    output: "pull-request",
+    secrets: [GH, AI],
+  },
 ];
 
 export function getEntry(id: string): CatalogEntry | undefined {
