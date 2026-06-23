@@ -39,9 +39,11 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`release-train`](loops/release-train/README.md) | Rolling Release PR (version + changelog) from conventional commits | deterministic | PR |
 | [`license-sbom-drift`](loops/license-sbom-drift/README.md) | Flag dependency licenses outside the allowlist | deterministic | PR |
 
-Plus a **long-horizon** loop — the
-[Experiment Lifecycle Orchestrator](loops/experiment/README.md) — built on the
-`longrun` primitives (durable state, approval gates, resumable plans).
+Plus two **long-horizon** loops on the `longrun` primitives (durable state,
+approval gates, resumable advancement): the
+[Experiment Lifecycle Orchestrator](loops/experiment/README.md) and the
+[Codemod Campaign](loops/codemod-campaign/README.md) (throttled cross-PR
+migration with a ledger + pilot gate).
 
 🌐 **[Project site](https://dcca.github.io/loopy/)** · See the
 [roadmap](openspec/roadmap.md) for the backlog and the
