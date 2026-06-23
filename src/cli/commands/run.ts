@@ -64,6 +64,17 @@ import {
   type EvalCase,
   type EvalSource,
 } from "../../../loops/prompt-eval-gate/index.js";
+import { createI18nDriftLoopFromManifest, type LocaleSource } from "../../../loops/i18n-drift/index.js";
+import { createPerfBudgetLoopFromManifest, type Measurer, type Metric } from "../../../loops/perf-budget/index.js";
+import {
+  createA11yBaselineLoopFromManifest,
+  type A11yScanner,
+  type Violation,
+} from "../../../loops/a11y-baseline/index.js";
+import {
+  createRunbookFreshnessLoopFromManifest,
+  type RunbookSource,
+} from "../../../loops/runbook-freshness/index.js";
 import {
   createDocWriter,
   createReviewer,
@@ -292,11 +303,89 @@ async function buildLoop(
       const state = options.stateStore ?? createFileStateStore(join(cwd, ".loopy", "state"));
       return createPromptEvalLoopFromManifest(manifest, { model, evals, state });
     }
+    case "i18n-drift": {
+      const file = env["LOOPY_I18N_FILE"];
+      if (!file) {
+        return "`i18n-drift` needs locale data. Set LOOPY_I18N_FILE to a JSON file { defaultKeys: string[], locales: [{ locale, keys }] }.";
+      }
+      const source: LocaleSource = {
+        defaultKeys: async () => {
+          const j = (await readJson(file)) as { defaultKeys?: string[] };
+          return Array.isArray(j.defaultKeys) ? j.defaultKeys : [];
+        },
+        locales: async () => {
+          const j = (await readJson(file)) as { locales?: { locale: string; keys: string[] }[] };
+          return Array.isArray(j.locales) ? j.locales : [];
+        },
+      };
+      return createI18nDriftLoopFromManifest(await loadManifest(manifestPath), { source });
+    }
+    case "perf-budget": {
+      const file = env["LOOPY_PERF_FILE"];
+      if (!file) {
+        return "`perf-budget` needs measurements. Set LOOPY_PERF_FILE to a JSON array of { name, value }.";
+      }
+      const measurer: Measurer = {
+        current: async () => {
+          const j = (await readJson(file)) as Metric[];
+          return Array.isArray(j) ? j : [];
+        },
+      };
+      const readBaseline = () => readJsonRecord(join(cwd, "perf-baseline.json"));
+      return createPerfBudgetLoopFromManifest(await loadManifest(manifestPath), { measurer, readBaseline });
+    }
+    case "a11y-baseline": {
+      const file = env["LOOPY_A11Y_FILE"];
+      if (!file) {
+        return "`a11y-baseline` needs a scan. Set LOOPY_A11Y_FILE to a JSON array of { id, selector, impact? }.";
+      }
+      const scanner: A11yScanner = {
+        scan: async () => {
+          const j = (await readJson(file)) as Violation[];
+          return Array.isArray(j) ? j : [];
+        },
+      };
+      const readBaseline = async (): Promise<Violation[]> => {
+        try {
+          const j = (await readJson(join(cwd, "a11y-baseline.json"))) as Violation[];
+          return Array.isArray(j) ? j : [];
+        } catch {
+          return [];
+        }
+      };
+      return createA11yBaselineLoopFromManifest(await loadManifest(manifestPath), { scanner, readBaseline });
+    }
+    case "runbook-freshness": {
+      const file = env["LOOPY_RUNBOOKS_FILE"];
+      if (!file) {
+        return "`runbook-freshness` needs runbook metadata. Set LOOPY_RUNBOOKS_FILE to a JSON array of { path, lastReviewedIso }.";
+      }
+      const source: RunbookSource = {
+        runbooks: async () => {
+          const j = (await readJson(file)) as { path: string; lastReviewedIso: string }[];
+          return Array.isArray(j) ? j : [];
+        },
+      };
+      return createRunbookFreshnessLoopFromManifest(await loadManifest(manifestPath), { source });
+    }
     default:
       return (
         `\`${entry.id}\` is not runnable via the CLI yet (needs additional boundaries — ` +
         `see loops/${entry.id}/README.md).`
       );
+  }
+}
+
+async function readJson(file: string): Promise<unknown> {
+  return JSON.parse(await readFile(file, "utf8")) as unknown;
+}
+
+async function readJsonRecord(file: string): Promise<Record<string, number>> {
+  try {
+    const j = (await readJson(file)) as Record<string, number>;
+    return j && typeof j === "object" ? j : {};
+  } catch {
+    return {};
   }
 }
 

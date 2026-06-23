@@ -115,6 +115,34 @@ export const CATALOG: CatalogEntry[] = [
     output: "pull-request",
     secrets: [GH, AI],
   },
+  {
+    id: "i18n-drift",
+    description: "Flag missing/orphaned translation keys across locales",
+    trigger: { kind: "event", events: ["pull_request"] },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "perf-budget",
+    description: "Flag performance regressions vs a stored baseline",
+    trigger: { kind: "event", events: ["pull_request"] },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "a11y-baseline",
+    description: "Fail only on new accessibility violations vs a baseline",
+    trigger: { kind: "event", events: ["pull_request"] },
+    output: "pull-request",
+    secrets: [GH],
+  },
+  {
+    id: "runbook-freshness",
+    description: "Flag runbooks past their review interval",
+    trigger: { kind: "schedule", cron: "0 7 * * 1" },
+    output: "pull-request",
+    secrets: [GH],
+  },
 ];
 
 export function getEntry(id: string): CatalogEntry | undefined {

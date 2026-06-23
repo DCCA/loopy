@@ -77,6 +77,22 @@
     "./loops/model-upgrade-migration": {
       "types": "./dist/loops/model-upgrade-migration/index.d.ts",
       "default": "./dist/loops/model-upgrade-migration/index.js"
+    },
+    "./loops/i18n-drift": {
+      "types": "./dist/loops/i18n-drift/index.d.ts",
+      "default": "./dist/loops/i18n-drift/index.js"
+    },
+    "./loops/perf-budget": {
+      "types": "./dist/loops/perf-budget/index.d.ts",
+      "default": "./dist/loops/perf-budget/index.js"
+    },
+    "./loops/a11y-baseline": {
+      "types": "./dist/loops/a11y-baseline/index.d.ts",
+      "default": "./dist/loops/a11y-baseline/index.js"
+    },
+    "./loops/runbook-freshness": {
+      "types": "./dist/loops/runbook-freshness/index.d.ts",
+      "default": "./dist/loops/runbook-freshness/index.js"
     }
   },
   "files": [
