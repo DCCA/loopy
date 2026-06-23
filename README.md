@@ -33,8 +33,14 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`test-coverage`](loops/test-coverage/README.md) | Backfills tests for uncovered changed lines (self-validating) | AI | PR |
 | [`security-remediation`](loops/security-remediation/README.md) | Human-gated fixes for security findings above a threshold | hybrid | PR |
 | [`kb-gap`](loops/kb-gap/README.md) | Drafts KB articles for recurring support topics (self-heal docs) | AI | PR |
+| [`metric-anomaly`](loops/metric-anomaly/README.md) | Z-score anomaly briefs over your metrics | deterministic | PR |
+| [`incident-followup`](loops/incident-followup/README.md) | Overdue postmortem action items + recurring root causes | deterministic | PR |
 
-The "top 5 after auto-docs" shortlist is complete. See the
+Plus a **long-horizon** loop — the
+[Experiment Lifecycle Orchestrator](loops/experiment/README.md) — built on the
+`longrun` primitives (durable state, approval gates, resumable plans).
+
+🌐 **[Project site](https://dcca.github.io/loopy/)** · See the
 [roadmap](openspec/roadmap.md) for the backlog and the
 [research catalog](openspec/research/loop-use-cases.md) for the full survey.
 
