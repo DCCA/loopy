@@ -73,6 +73,10 @@
     "./loops/prompt-eval-gate": {
       "types": "./dist/loops/prompt-eval-gate/index.d.ts",
       "default": "./dist/loops/prompt-eval-gate/index.js"
+    },
+    "./loops/model-upgrade-migration": {
+      "types": "./dist/loops/model-upgrade-migration/index.d.ts",
+      "default": "./dist/loops/model-upgrade-migration/index.js"
     }
   },
   "files": [

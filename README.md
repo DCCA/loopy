@@ -40,11 +40,13 @@ guardrail violation) it produces no output and never partially applies changes.
 | [`license-sbom-drift`](loops/license-sbom-drift/README.md) | Flag dependency licenses outside the allowlist | deterministic | PR |
 | [`prompt-eval-gate`](loops/prompt-eval-gate/README.md) | Regression-gate prompts vs a baseline (stateful); gated promotion | AI + state | comment / PR |
 
-Plus two **long-horizon** loops on the `longrun` primitives (durable state,
+Plus three **long-horizon** loops on the `longrun` primitives (durable state,
 approval gates, resumable advancement): the
-[Experiment Lifecycle Orchestrator](loops/experiment/README.md) and the
+[Experiment Lifecycle Orchestrator](loops/experiment/README.md), the
 [Codemod Campaign](loops/codemod-campaign/README.md) (throttled cross-PR
-migration with a ledger + pilot gate).
+migration with a ledger + pilot gate), and the
+[Model-Upgrade Migration](loops/model-upgrade-migration/README.md) (golden-set
+diff → human-gated model switch).
 
 🌐 **[Project site](https://dcca.github.io/loopy/)** · See the
 [roadmap](openspec/roadmap.md) for the backlog and the
