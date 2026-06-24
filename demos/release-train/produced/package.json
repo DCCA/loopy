@@ -1,0 +1,149 @@
+{
+  "name": "loopy",
+  "version": "0.2.0",
+  "description": "A library of reusable automation loops for software teams.",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "bin": {
+    "loopy": "./dist/src/cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    },
+    "./loops/auto-docs": {
+      "types": "./dist/loops/auto-docs/index.d.ts",
+      "default": "./dist/loops/auto-docs/index.js"
+    },
+    "./loops/dep-updates": {
+      "types": "./dist/loops/dep-updates/index.d.ts",
+      "default": "./dist/loops/dep-updates/index.js"
+    },
+    "./loops/changelog": {
+      "types": "./dist/loops/changelog/index.d.ts",
+      "default": "./dist/loops/changelog/index.js"
+    },
+    "./loops/pr-review": {
+      "types": "./dist/loops/pr-review/index.d.ts",
+      "default": "./dist/loops/pr-review/index.js"
+    },
+    "./loops/test-coverage": {
+      "types": "./dist/loops/test-coverage/index.d.ts",
+      "default": "./dist/loops/test-coverage/index.js"
+    },
+    "./loops/security-remediation": {
+      "types": "./dist/loops/security-remediation/index.d.ts",
+      "default": "./dist/loops/security-remediation/index.js"
+    },
+    "./loops/kb-gap": {
+      "types": "./dist/loops/kb-gap/index.d.ts",
+      "default": "./dist/loops/kb-gap/index.js"
+    },
+    "./loops/experiment": {
+      "types": "./dist/loops/experiment/index.d.ts",
+      "default": "./dist/loops/experiment/index.js"
+    },
+    "./loops/metric-anomaly": {
+      "types": "./dist/loops/metric-anomaly/index.d.ts",
+      "default": "./dist/loops/metric-anomaly/index.js"
+    },
+    "./loops/incident-followup": {
+      "types": "./dist/loops/incident-followup/index.d.ts",
+      "default": "./dist/loops/incident-followup/index.js"
+    },
+    "./loops/flake-quarantine": {
+      "types": "./dist/loops/flake-quarantine/index.d.ts",
+      "default": "./dist/loops/flake-quarantine/index.js"
+    },
+    "./loops/release-train": {
+      "types": "./dist/loops/release-train/index.d.ts",
+      "default": "./dist/loops/release-train/index.js"
+    },
+    "./loops/license-sbom-drift": {
+      "types": "./dist/loops/license-sbom-drift/index.d.ts",
+      "default": "./dist/loops/license-sbom-drift/index.js"
+    },
+    "./loops/codemod-campaign": {
+      "types": "./dist/loops/codemod-campaign/index.d.ts",
+      "default": "./dist/loops/codemod-campaign/index.js"
+    },
+    "./loops/prompt-eval-gate": {
+      "types": "./dist/loops/prompt-eval-gate/index.d.ts",
+      "default": "./dist/loops/prompt-eval-gate/index.js"
+    },
+    "./loops/model-upgrade-migration": {
+      "types": "./dist/loops/model-upgrade-migration/index.d.ts",
+      "default": "./dist/loops/model-upgrade-migration/index.js"
+    },
+    "./loops/i18n-drift": {
+      "types": "./dist/loops/i18n-drift/index.d.ts",
+      "default": "./dist/loops/i18n-drift/index.js"
+    },
+    "./loops/perf-budget": {
+      "types": "./dist/loops/perf-budget/index.d.ts",
+      "default": "./dist/loops/perf-budget/index.js"
+    },
+    "./loops/a11y-baseline": {
+      "types": "./dist/loops/a11y-baseline/index.d.ts",
+      "default": "./dist/loops/a11y-baseline/index.js"
+    },
+    "./loops/runbook-freshness": {
+      "types": "./dist/loops/runbook-freshness/index.d.ts",
+      "default": "./dist/loops/runbook-freshness/index.js"
+    },
+    "./loops/test-impact-budget": {
+      "types": "./dist/loops/test-impact-budget/index.d.ts",
+      "default": "./dist/loops/test-impact-budget/index.js"
+    },
+    "./loops/data-contract-guard": {
+      "types": "./dist/loops/data-contract-guard/index.d.ts",
+      "default": "./dist/loops/data-contract-guard/index.js"
+    },
+    "./loops/cost-guardrail": {
+      "types": "./dist/loops/cost-guardrail/index.d.ts",
+      "default": "./dist/loops/cost-guardrail/index.js"
+    },
+    "./loops/eval-set-drift": {
+      "types": "./dist/loops/eval-set-drift/index.d.ts",
+      "default": "./dist/loops/eval-set-drift/index.js"
+    },
+    "./loops/api-deprecation-rollout": {
+      "types": "./dist/loops/api-deprecation-rollout/index.d.ts",
+      "default": "./dist/loops/api-deprecation-rollout/index.js"
+    },
+    "./loops/dep-major-migration": {
+      "types": "./dist/loops/dep-major-migration/index.d.ts",
+      "default": "./dist/loops/dep-major-migration/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "loops/*/loop.yaml",
+    "loops/*/playbook.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dogfood": "node scripts/dogfood.mjs"
+  },
+  "dependencies": {
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/node": "^22.7.0",
+    "eslint": "^9.13.0",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.10.0",
+    "vitest": "^2.1.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

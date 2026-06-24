@@ -60,6 +60,24 @@ human-gated approval → emit the major bump).
 [roadmap](openspec/roadmap.md) for the backlog and the
 [research catalog](openspec/research/loop-use-cases.md) for the full survey.
 
+## Proof it works — demo gallery
+
+Want to see what each loop actually produces? The **[demo gallery](demos/README.md)**
+holds the **real artifacts** every loop generates — the report markdown, PR file
+changes, advisory comments, and long-horizon lifecycle transcripts — each from a
+realistic example input. They're not hand-written: the dogfood harness runs all
+26 loops end-to-end and emits them.
+
+```bash
+npm run build && npm run dogfood            # run all loops, assert each works (28/28)
+npm run build && npm run dogfood -- --emit demos   # regenerate the demo artifacts
+```
+
+The harness drives CLI loops through the real `loopy run --dry-run` path with
+injected/fixture boundaries, gated loops through block→approve→PR, and the
+export-only long-horizon loops through their full `advance()` lifecycles. CI runs
+it on every push (see [`.github/workflows/dogfood.yml`](.github/workflows/dogfood.yml)).
+
 ## Project layout
 
 ```
