@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "surface": [
+    {
+      "path": "src/adapters/github-action/diff.ts",
+      "hash": "8a428c656e7f44afbb10bbd4489514d2e1dc228337799e59f85ca143644680d8"
+    },
+    {
+      "path": "src/adapters/github-action/github-client.ts",
+      "hash": "a71b100d249f5b6d3adc9429e71c55697693b61980c3dbf9d330a1a7bbc5ad0c"
+    },
+    {
+      "path": "src/adapters/github-action/index.ts",
+      "hash": "59b2e8108608a5776cd2dcdebd5b431b26e07a58431a6dcb54fe38d483d74e79"
+    },
+    {
+      "path": "src/adapters/github-action/run.ts",
+      "hash": "ad65447678c7f9f4d2baca469f1202a6468602da74399077967d0375eea3ffac"
+    },
+    {
+      "path": "src/ai/client.ts",
+      "hash": "dfe613b6c59734ba6331dbfce49e044d60584e9a1e464fd6e6e120efdcc790c8"
+    },
+    {
+      "path": "src/ai/config.ts",
+      "hash": "ec2ef62305e400b7d8bb7abfa360cf09032d89da1b3414a24d52ab4100dbbfeb"
+    },
+    {
+      "path": "src/ai/index.ts",
+      "hash": "738fd45c6dc1561f4952f27995ee3afb4dc95adb7df11a5f78a7008a0a2d9842"
+    },
+    {
+      "path": "src/ai/json.ts",
+      "hash": "86c7b6f61cf5ebfa5d9f87809f03c8fa3329b6327942ab52b53b8b05c9257e9f"
+    },
+    {
+      "path": "src/ai/providers.ts",
+      "hash": "76a0e81e7dffb7eb60c27ec82645156969f29a0ef41054bc5921f2a9b71966a9"
+    },
+    {
+      "path": "src/cli/catalog.ts",
+      "hash": "be91bebbfe79cea3e9c32e4349ea1ce374609c3a3a5895ab26b9e9b0732180ce"
+    },
+    {
+      "path": "src/cli/commands/add.ts",
+      "hash": "9c64721316dcc88b07e6169b60b63fd30b6a6d76db20fa00158a14b472890bd3"
+    },
+    {
+      "path": "src/cli/commands/list.ts",
+      "hash": "ad7c567ad3dda965723638eb1d6562633cd4d8f4e3b63e7b6d733a2fef2010d0"
+    },
+    {
+      "path": "src/cli/commands/run.ts",
+      "hash": "cced8e3c772a6c8c1e4c138d3da92db897fb3c2b9f6e3abf3345c1f2b62e4f54"
+    },
+    {
+      "path": "src/cli/index.ts",
+      "hash": "37d68a115b0bc2200879e943ec3bed9e20d598584bb08e3d06260fdaa327530a"
+    },
+    {
+      "path": "src/cli/template.ts",
+      "hash": "753412a2ce653f43efc4b9219f227aea48b74d55a9b9d64ce0a31756ffcb54ca"
+    },
+    {
+      "path": "src/core/guardrails.ts",
+      "hash": "5a92fd5a22371369bf806f1d6afd4626bd92c45fc782c9a23ba702fa114fe179"
+    },
+    {
+      "path": "src/core/index.ts",
+      "hash": "479828873c902eb8f4c1ee908646cc139fcae1b700fde0e6e250a02df651b152"
+    },
+    {
+      "path": "src/core/logger.ts",
+      "hash": "aba734bc6b9267e9ecca7faf827872f85a6f61dbc209a976f3a3fddef1264f4e"
+    },
+    {
+      "path": "src/core/longrun/gate.ts",
+      "hash": "38c5cf2f7fd9d99429fd62c9a2b3e61f12a9fc10c1bd50a6e14d3d4a0191d772"
+    },
+    {
+      "path": "src/core/longrun/index.ts",
+      "hash": "120d935b01123185d84238e6ff1b26dfc7211ce09cb7c3d57e3f5bfebc226972"
+    },
+    {
+      "path": "src/core/longrun/state.ts",
+      "hash": "d441dfe26b4b713f556981479d45d7b640dedc31429079e29bc4097cf3a77831"
+    },
+    {
+      "path": "src/core/longrun/steps.ts",
+      "hash": "b7b276cc34c99eee0def04430bfb7fda6f6a71c51566dc80c734aedb6c70f261"
+    },
+    {
+      "path": "src/core/manifest.ts",
+      "hash": "451d16997f76f1364307a2203a537848076a7e4945c572ff886a0914309eb4a3"
+    },
+    {
+      "path": "src/core/runner.ts",
+      "hash": "9a43dc3e33e4049d72f24d8cb05ae80067041388a9585a68826d19d214793df1"
+    },
+    {
+      "path": "src/core/types.ts",
+      "hash": "b9e1723f972f1737ff6d0693b38c392d35ed97e73669e6119674026e95b95e8f"
+    },
+    {
+      "path": "src/index.ts",
+      "hash": "f19dbef3a4d229daf651863b23f134917b57d6be100f46c33f4b2907c2675843"
+    }
+  ],
+  "digest": "9f0569cbcc454ba5faa5fa0a7d61843ca759888233e3074ede8c3e8676724629"
+}
